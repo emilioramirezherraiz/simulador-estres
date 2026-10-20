@@ -17,7 +17,7 @@ def call_llm(system: str, user: str, api_key: str, model: str = DEFAULT_MODEL,
              retries: int = 3) -> str:
     """Devuelve el texto de la respuesta del modelo.
 
-    Si se supera el límite de peticiones del nivel gratuito (error 429),
+    Si se supera el límite de peticiones del nivel gratuito (error 429) o el servidor está saturado (error 503),
     espera y reintenta automáticamente.
     """
     client = genai.Client(api_key=api_key)
@@ -33,7 +33,7 @@ def call_llm(system: str, user: str, api_key: str, model: str = DEFAULT_MODEL,
             response = client.models.generate_content(model=model, contents=user, config=config)
             break
         except Exception as e:  # noqa: BLE001
-                        limited = any(code in str(e) for code in ("429", "RESOURCE_EXHAUSTED", "503", "UNAVAILABLE"))
+            limited = any(code in str(e) for code in ("429", "RESOURCE_EXHAUSTED", "503", "UNAVAILABLE"))
             if limited and attempt < retries - 1:
                 time.sleep(20 * (attempt + 1))
                 continue
