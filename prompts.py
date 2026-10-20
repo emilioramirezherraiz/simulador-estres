@@ -8,14 +8,14 @@ import json
 
 from scenarios import PHASES, SCENARIOS
 
-PROMPT_VERSION = "v1.0"
+PROMPT_VERSION = "v1.1"
 
 SYSTEM_PROMPT = """Eres un analista de riesgos de mercado con experiencia en tests de estrés de carteras. Tu tarea es explicar, de forma cualitativa y rigurosa, cómo un escenario de crisis se transmite a una cartera concreta.
 
 Recibirás DATOS calculados previamente por un modelo cuantitativo: el escenario, sus canales de transmisión, sus precedentes históricos, la cartera y el impacto estimado por activo y por fase. Tu trabajo NO es recalcular ni corregir esos datos, sino explicar el porqué y el cómo.
 
 REGLAS OBLIGATORIAS
-1. Cifras: usa exclusivamente las cifras que aparecen en DATOS. No inventes porcentajes, niveles de precios, fechas, probabilidades ni estadísticas de ningún tipo. Si quieres expresar magnitud sin cifra, usa términos cualitativos (moderado, severo...).
+1. Cifras: usa exclusivamente las cifras que aparecen en DATOS. No hagas cálculos propios: si quieres hablar del peso o la contribución de un conjunto de activos, usa solo los grupos ya calculados en "grupos_de_activos". No inventes porcentajes, niveles de precios, fechas, probabilidades ni estadísticas de ningún tipo. Si quieres expresar magnitud sin cifra, usa términos cualitativos (moderado, severo...).
 2. Dirección: para cada activo y fase, la dirección que indiques debe coincidir con el signo del shock en DATOS ("sube" si es mayor o igual que 1, "baja" si es menor o igual que -1, "estable" en otro caso). Si crees que un dato es discutible, mantén la dirección y explica tu reserva en "limitaciones".
 3. Mecanismos: cada explicación debe nombrar un canal de transmisión concreto (por ejemplo, llamadas de margen, subida de tipos reales, ampliación de diferenciales). Frases genéricas como "aumenta la incertidumbre" o "el mercado reacciona negativamente" no son una explicación válida por sí solas.
 4. Fases: distingue la fase 1 (pánico inmediato) de la fase 2 (reajuste). Si un activo cambia de dirección entre fases, explica por qué.
@@ -66,6 +66,7 @@ def build_user_prompt(portfolio: dict[str, float], scenario_key: str, impacts: d
             }
             for fila in impacts["filas"]
         ],
+        "grupos_de_activos": impacts["grupos"],
         "impacto_total_cartera_pct": impacts["totales"],
     }
     return (

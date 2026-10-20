@@ -1,6 +1,6 @@
 """Cálculo determinista del impacto (sin IA)."""
 
-from scenarios import ASSET_CLASSES, PHASES, SCENARIOS
+from scenarios import ASSET_CLASSES, ASSET_GROUPS, PHASES, SCENARIOS
 
 
 def compute_impacts(portfolio: dict[str, float], scenario_key: str) -> dict:
@@ -24,7 +24,17 @@ def compute_impacts(portfolio: dict[str, float], scenario_key: str) -> dict:
             totales[fase] += contribucion
         filas.append(fila)
 
+    grupos = {}
+    for grupo, miembros in ASSET_GROUPS.items():
+        presentes = [f for f in filas if f["activo"] in miembros]
+        if len(presentes) >= 2:  # solo tiene sentido agregar si hay varios
+            grupos[grupo] = {
+                "peso": round(sum(f["peso"] for f in presentes), 2),
+                **{f"{fase}_contrib": round(sum(f[f"{fase}_contrib"] for f in presentes), 2) for fase in PHASES},
+            }
+
     return {
         "filas": filas,
+        "grupos": grupos,
         "totales": {fase: round(valor, 2) for fase, valor in totales.items()},
     }

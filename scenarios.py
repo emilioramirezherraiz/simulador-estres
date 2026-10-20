@@ -22,8 +22,18 @@ ASSET_CLASSES = {
 }
 
 PHASES = {
-    "fase_1": "Fase 1: pánico de liquidez (0 a 2 semanas)",
+    "fase_1": "Fase 1: impacto inmediato (0 a 2 semanas)",
     "fase_2": "Fase 2: reajuste (1 a 6 meses)",
+}
+
+# Agregaciones con sentido financiero que el modelo puede usar (v1.1).
+# El código calcula sus pesos y se los pasa como datos, así el modelo no tiene
+# que sumar por su cuenta y el validador sabe qué cifras agregadas son legítimas.
+ASSET_GROUPS = {
+    "renta_variable": ["rv_desarrollada", "rv_emergente"],
+    "renta_fija": ["bonos_core", "high_yield"],
+    "cripto": ["bitcoin", "stablecoins"],
+    "materias_primas": ["oro", "petroleo"],
 }
 
 SCENARIOS = {

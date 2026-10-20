@@ -45,6 +45,9 @@ def _allowed_numbers(portfolio: dict, scenario_key: str, impacts: dict) -> set[f
     for fila in impacts["filas"]:
         for fase in PHASES:
             allowed.add(abs(float(fila[f"{fase}_contrib"])))
+    # v1.1: también son legítimas las agregaciones por grupo calculadas en engine.py
+    for grupo in impacts.get("grupos", {}).values():
+        allowed.update(abs(float(v)) for v in grupo.values())
     return allowed
 
 
