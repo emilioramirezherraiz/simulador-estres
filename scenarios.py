@@ -26,6 +26,20 @@ PHASES = {
     "fase_2": "Fase 2: reajuste (1 a 6 meses)",
 }
 
+# Etiquetas cortas para tablas y gráficos.
+ASSET_SHORT = {
+    "rv_desarrollada": "RV desarr.", "rv_emergente": "RV emerg.",
+    "bonos_core": "Bonos core", "high_yield": "High yield",
+    "inmobiliario": "Inmobiliario", "oro": "Oro", "petroleo": "Petróleo",
+    "bitcoin": "Bitcoin", "stablecoins": "Stablecoins", "liquidez": "Liquidez",
+}
+
+# Periodo de referencia "en calma" con el que se comparan las ventanas de estrés (v1.2).
+CALM_WINDOW = {
+    "inicio": "2017-01-01", "fin": "2019-12-31",
+    "justificacion": "Periodo previo a la COVID-19, con inflación baja y sin crisis sistémica; bitcoin ya cotiza.",
+}
+
 # Agregaciones con sentido financiero que el modelo puede usar (v1.1).
 # El código calcula sus pesos y se los pasa como datos, así el modelo no tiene
 # que sumar por su cuenta y el validador sabe qué cifras agregadas son legítimas.
@@ -54,6 +68,10 @@ SCENARIOS = {
             "Desapalancamiento forzado en exchanges y protocolos DeFi",
             "Pérdida de confianza que se extiende a activos de riesgo con inversores comunes",
         ],
+        "ventana_estres": {
+            "inicio": "2022-05-01", "fin": "2022-06-30",
+            "justificacion": "Colapso de Terra/UST y contagio posterior en el ecosistema cripto.",
+        },
         "shocks": {
             "fase_1": {
                 "rv_desarrollada": -6, "rv_emergente": -8, "bonos_core": 0,
@@ -84,6 +102,10 @@ SCENARIOS = {
             "Caída de la renta disponible y del consumo",
             "Deterioro de las balanzas de los países importadores de energía",
         ],
+        "ventana_estres": {
+            "inicio": "2022-02-24", "fin": "2022-10-31",
+            "justificacion": "Invasión de Ucrania, escalada de los precios de la energía y subidas de tipos.",
+        },
         "shocks": {
             "fase_1": {
                 "rv_desarrollada": -8, "rv_emergente": -10, "bonos_core": -4,
@@ -114,6 +136,10 @@ SCENARIOS = {
             "Caída brusca de la demanda esperada",
             "Intervención posterior de bancos centrales y gobiernos",
         ],
+        "ventana_estres": {
+            "inicio": "2020-02-19", "fin": "2020-04-30",
+            "justificacion": "Crash por la COVID-19: del máximo del S&P 500 a la estabilización tras la intervención de la Reserva Federal.",
+        },
         "shocks": {
             "fase_1": {
                 "rv_desarrollada": -30, "rv_emergente": -32, "bonos_core": 3,

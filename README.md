@@ -14,7 +14,14 @@ La app separa dos capas. La capa cuantitativa (`scenarios.py` y `engine.py`) cal
 | `prompts.py` | Prompt de sistema y versión del prompt |
 | `llm.py` | Llamada a la API de Google Gemini |
 | `validation.py` | Detector automático de posibles alucinaciones |
+| `market_data.py` | Datos de mercado de Yahoo Finance (ETFs representativos de cada clase) |
+| `correlations.py` | Correlaciones, volatilidad y diversificación en calma frente a estrés |
+| `build_snapshot.py` | Descarga los precios y los guarda en `data/precios.csv` |
 | `evaluate.py` | Evaluación en lote para comparar versiones del prompt |
+
+## Datos de mercado (v1.2)
+
+Las correlaciones se calculan con precios reales. Para que los resultados sean reproducibles, la app usa primero la copia guardada en `data/precios.csv` y solo descarga de Yahoo Finance si no existe. Para crear o actualizar esa copia, ejecuta la acción de GitHub "Actualizar datos de mercado" (`gh workflow run snapshot.yml`) y después `git pull`.
 
 ## Clave de API
 

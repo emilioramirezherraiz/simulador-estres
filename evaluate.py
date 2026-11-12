@@ -15,7 +15,9 @@ import os
 import time
 from pathlib import Path
 
+from correlations import compute_correlations
 from engine import compute_impacts
+from market_data import load_prices
 from llm import DEFAULT_MODEL, call_llm, parse_json
 from prompts import PROMPT_VERSION, SYSTEM_PROMPT, build_user_prompt
 from scenarios import SCENARIOS
@@ -36,14 +38,17 @@ def main() -> None:
     out = Path("logs") / f"evaluacion_{PROMPT_VERSION}_{stamp}.csv"
     out.parent.mkdir(exist_ok=True)
 
+    prices, fuente = load_prices()
+    print(f"Datos de mercado: {fuente}")
     rows = []
     for p_name, portfolio in TEST_PORTFOLIOS.items():
         for s_key in SCENARIOS:
             impacts = compute_impacts(portfolio, s_key)
-            raw = call_llm(SYSTEM_PROMPT, build_user_prompt(portfolio, s_key, impacts), api_key, model)
+            corr = compute_correlations(prices, portfolio, s_key)
+            raw = call_llm(SYSTEM_PROMPT, build_user_prompt(portfolio, s_key, impacts, corr), api_key, model)
             try:
                 report = parse_json(raw)
-                issues = validate_report(report, portfolio, s_key, impacts)
+                issues = validate_report(report, portfolio, s_key, impacts, corr)
             except Exception as e:  # noqa: BLE001
                 issues = [{"tipo": "json_invalido", "detalle": str(e)}]
             time.sleep(5)  # margen para el límite del nivel gratuito

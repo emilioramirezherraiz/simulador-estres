@@ -5,13 +5,16 @@ import json
 import os
 from pathlib import Path
 
+import altair as alt
 import pandas as pd
 import streamlit as st
 
+from correlations import compute_correlations
 from engine import compute_impacts
 from llm import DEFAULT_MODEL, call_llm, parse_json
 from prompts import PROMPT_VERSION, SYSTEM_PROMPT, build_user_prompt
-from scenarios import ASSET_CLASSES, PHASES, SCENARIOS
+from market_data import load_prices
+from scenarios import ASSET_CLASSES, ASSET_SHORT, PHASES, SCENARIOS
 from validation import validate_report
 
 LOG_PATH = Path("logs/runs.jsonl")
@@ -36,6 +39,71 @@ def save_run(run: dict) -> None:
             f.write(json.dumps(run, ensure_ascii=False) + "\n")
     except OSError:
         pass
+
+
+@st.cache_data(ttl=24 * 3600, show_spinner="Cargando datos de mercado...")
+def get_prices():
+    return load_prices()
+
+
+def heatmap(matriz: pd.DataFrame, titulo: str) -> alt.Chart:
+    orden = [ASSET_SHORT[a] for a in matriz.index]
+    m = matriz.rename(index=ASSET_SHORT, columns=ASSET_SHORT)
+    m.index.name = "fila"
+    largo = m.reset_index().melt(id_vars="fila", var_name="columna", value_name="correlacion").dropna()
+    base = alt.Chart(largo).encode(
+        x=alt.X("columna:N", sort=orden, title=None, axis=alt.Axis(labelAngle=-40)),
+        y=alt.Y("fila:N", sort=orden, title=None),
+    )
+    celdas = base.mark_rect().encode(
+        color=alt.Color("correlacion:Q", scale=alt.Scale(domain=[-1, 1], scheme="redblue", reverse=True),
+                        legend=alt.Legend(title="Correlación")),
+        tooltip=["fila", "columna", alt.Tooltip("correlacion:Q", format=".2f")],
+    )
+    texto = base.mark_text(fontSize=11).encode(text=alt.Text("correlacion:Q", format=".2f"))
+    return (celdas + texto).properties(title=titulo, height=40 * len(orden) + 60)
+
+
+def render_correlations(corr: dict | None, fuente: str) -> None:
+    st.subheader("Correlaciones: calma frente a estrés")
+    if corr is None:
+        st.info(
+            "No hay datos de mercado suficientes para esta cartera. Hacen falta al menos dos clases de activo "
+            f"con precio histórico (fuente: {fuente})."
+        )
+        return
+    vc, ve = corr["ventana_calma"], corr["ventana_estres"]
+    st.caption(
+        f"Calma: {vc['inicio']} a {vc['fin']}. Estrés: {ve['inicio']} a {ve['fin']} ({ve['justificacion']}) "
+        f"Datos: {fuente}. Cubre el {corr['peso_cubierto_pct']:.1f} % de la cartera."
+    )
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Correlación media", f"{corr['estres']['correlacion_media']:.2f}",
+              f"{corr['estres']['correlacion_media'] - corr['calma']['correlacion_media']:+.2f} frente a calma",
+              delta_color="inverse")
+    c2.metric("Volatilidad anual de la cartera", f"{corr['estres']['volatilidad_cartera_pct']:.1f} %",
+              f"{corr['estres']['volatilidad_cartera_pct'] - corr['calma']['volatilidad_cartera_pct']:+.1f} pp frente a calma",
+              delta_color="inverse")
+    c3.metric("Ratio de diversificación", f"{corr['estres']['ratio_diversificacion']:.2f}",
+              f"{corr['estres']['ratio_diversificacion'] - corr['calma']['ratio_diversificacion']:+.2f} frente a calma",
+              help="Media ponderada de las volatilidades dividida entre la volatilidad de la cartera. "
+                   "Cuanto más cerca de 1, menos beneficio aporta la diversificación.")
+    h1, h2 = st.columns(2)
+    h1.altair_chart(heatmap(corr["calma"]["matriz"], "Calma"), width="stretch")
+    h2.altair_chart(heatmap(corr["estres"]["matriz"], "Estrés"), width="stretch")
+    st.markdown("**Pares que más cambian**")
+    st.dataframe(
+        pd.DataFrame([{"Par": c["par"], "Calma": c["calma"], "Estrés": c["estres"], "Cambio": c["cambio"]}
+                      for c in corr["mayores_cambios"]]),
+        hide_index=True, width="stretch",
+    )
+    notas = []
+    if corr["sin_precio"]:
+        notas.append("sin precio de mercado útil: " + ", ".join(ASSET_SHORT[a] for a in corr["sin_precio"]))
+    if corr["sin_historico"]:
+        notas.append("sin histórico suficiente: " + ", ".join(ASSET_SHORT[a] for a in corr["sin_historico"]))
+    if notas:
+        st.caption("Excluidos del cálculo (" + "; ".join(notas) + "). La volatilidad se calcula sobre la parte cubierta.")
 
 
 def render_report(run: dict) -> None:
@@ -77,7 +145,10 @@ def render_report(run: dict) -> None:
         }
         for item in report.get("impacto_por_activo", [])
     ]
-    st.dataframe(pd.DataFrame(filas), hide_index=True, use_container_width=True)
+    st.dataframe(pd.DataFrame(filas), hide_index=True, width="stretch")
+
+    st.markdown("#### Diversificación")
+    st.write(report.get("diversificacion", ""))
 
     st.markdown("#### Riesgos de concentración")
     st.write(report.get("riesgos_de_concentracion", ""))
@@ -138,7 +209,7 @@ with col_left:
             "Peso (%)": st.column_config.NumberColumn(min_value=0.0, max_value=100.0, step=1.0, format="%.1f"),
         },
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
         key="portfolio_editor",
     )
     total = float(edited["Peso (%)"].fillna(0).sum())
@@ -188,14 +259,18 @@ tabla = pd.DataFrame([
     }
     for f in impacts["filas"]
 ])
-st.dataframe(tabla, hide_index=True, use_container_width=True)
+st.dataframe(tabla, hide_index=True, width="stretch")
 st.caption("Calculado sin IA a partir de la tabla de sensibilidades del escenario (scenarios.py). Variación acumulada desde el inicio del shock.")
+
+prices, fuente = get_prices()
+corr = compute_correlations(prices, portfolio, scenario_key)
+render_correlations(corr, fuente)
 
 st.divider()
 st.subheader("4. Informe narrativo")
 
 if st.button("Generar informe", type="primary", disabled=not api_key):
-    user_prompt = build_user_prompt(portfolio, scenario_key, impacts)
+    user_prompt = build_user_prompt(portfolio, scenario_key, impacts, corr)
     with st.spinner("Generando el informe..."):
         try:
             raw = call_llm(SYSTEM_PROMPT, user_prompt, api_key=api_key, model=model)
@@ -205,7 +280,7 @@ if st.button("Generar informe", type="primary", disabled=not api_key):
 
     try:
         report = parse_json(raw)
-        issues = validate_report(report, portfolio, scenario_key, impacts)
+        issues = validate_report(report, portfolio, scenario_key, impacts, corr)
     except Exception as e:  # noqa: BLE001
         report = None
         issues = [{"tipo": "json_invalido", "detalle": str(e)}]
@@ -217,6 +292,7 @@ if st.button("Generar informe", type="primary", disabled=not api_key):
         "escenario": scenario_key,
         "cartera": portfolio,
         "totales": impacts["totales"],
+        "correlacion_media": ({p: corr[p]["correlacion_media"] for p in ("calma", "estres")} if corr else None),
         "n_incidencias": len(issues),
         "incidencias": issues,
         "informe": report,

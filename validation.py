@@ -9,12 +9,14 @@ import re
 from scenarios import PHASES, SCENARIOS
 
 REQUIRED_KEYS = [
-    "resumen_ejecutivo", "cadena_de_contagio", "impacto_por_activo",
+    "resumen_ejecutivo", "cadena_de_contagio", "impacto_por_activo", "diversificacion",
     "riesgos_de_concentracion", "supuestos", "limitaciones",
     "confianza", "justificacion_confianza",
 ]
 VALID_DIRECTIONS = {"sube", "baja", "estable"}
 PERCENT_RE = re.compile(r"(-?\d+(?:[.,]\d+)?)\s?%")
+# Números tipo correlación (0,85 / -0,3) que no son porcentajes.
+CORR_RE = re.compile(r"(?<![\d.,])[-−]?(0[.,]\d{1,2})(?![\d%])")
 
 
 def expected_direction(shock: float) -> str:
@@ -36,7 +38,7 @@ def _iter_strings(obj):
             yield from _iter_strings(value)
 
 
-def _allowed_numbers(portfolio: dict, scenario_key: str, impacts: dict) -> set[float]:
+def _allowed_numbers(portfolio: dict, scenario_key: str, impacts: dict, corr: dict | None = None) -> set[float]:
     allowed = {100.0, 0.0}
     allowed.update(abs(float(w)) for w in portfolio.values())
     for fase in PHASES:
@@ -48,10 +50,28 @@ def _allowed_numbers(portfolio: dict, scenario_key: str, impacts: dict) -> set[f
     # v1.1: también son legítimas las agregaciones por grupo calculadas en engine.py
     for grupo in impacts.get("grupos", {}).values():
         allowed.update(abs(float(v)) for v in grupo.values())
+    # v1.2: volatilidades y peso cubierto del análisis de correlaciones
+    if corr:
+        allowed.add(abs(float(corr["peso_cubierto_pct"])))
+        for periodo in ("calma", "estres"):
+            allowed.add(abs(float(corr[periodo]["volatilidad_cartera_pct"])))
+            allowed.update(abs(float(v)) for v in corr[periodo]["volatilidades_pct"].values())
     return allowed
 
 
-def validate_report(report: dict, portfolio: dict, scenario_key: str, impacts: dict) -> list[dict]:
+def _allowed_correlations(corr: dict | None) -> set[float]:
+    if not corr:
+        return set()
+    values = set()
+    for periodo in ("calma", "estres"):
+        values.update(abs(float(v)) for v in corr[periodo]["matriz"].to_numpy().ravel())
+        values.add(abs(float(corr[periodo]["correlacion_media"])))
+    values.update(abs(float(c["cambio"])) for c in corr["mayores_cambios"])
+    return values
+
+
+def validate_report(report: dict, portfolio: dict, scenario_key: str, impacts: dict,
+                    corr: dict | None = None) -> list[dict]:
     issues = []
 
     # 1. Estructura
@@ -83,7 +103,7 @@ def validate_report(report: dict, portfolio: dict, scenario_key: str, impacts: d
             issues.append({"tipo": "activo_inventado", "detalle": f"El informe incluye '{activo}', que no está en la cartera."})
 
     # 3. Cifras que no aparecen en los datos
-    allowed = _allowed_numbers(portfolio, scenario_key, impacts)
+    allowed = _allowed_numbers(portfolio, scenario_key, impacts, corr)
     seen = set()
     for text in _iter_strings(report):
         for match in PERCENT_RE.finditer(text):
@@ -96,6 +116,24 @@ def validate_report(report: dict, portfolio: dict, scenario_key: str, impacts: d
                     "tipo": "cifra_no_respaldada",
                     "detalle": f"Aparece '{match.group(0)}', que no está en los datos.",
                 })
+
+    # 3b. Correlaciones que no aparecen en los datos (v1.2)
+    if corr:
+        allowed_corr = _allowed_correlations(corr)
+        seen_corr = set()
+        for text in _iter_strings(report):
+            for match in CORR_RE.finditer(text):
+                raw = match.group(1)
+                value = float(raw.replace(",", "."))
+                if value in seen_corr:
+                    continue
+                seen_corr.add(value)
+                tol = 0.011 if len(raw) == 4 else 0.051  # dos decimales o uno
+                if not any(abs(value - a) <= tol for a in allowed_corr):
+                    issues.append({
+                        "tipo": "correlacion_no_respaldada",
+                        "detalle": f"Aparece la correlación '{match.group(0)}', que no está en los datos.",
+                    })
 
     # 4. Confianza
     if str(report.get("confianza", "")).lower() not in {"alta", "media", "baja"}:
