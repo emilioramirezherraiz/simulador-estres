@@ -7,13 +7,14 @@ import time
 from google import genai
 from google.genai import types
 
-# Puedes cambiarlo desde los secretos (GEMINI_MODEL) o desde la barra lateral.
+# v1.4.2: temperatura baja (0.2) para reducir la variabilidad entre ejecuciones.
+# Puedes cambiar el modelo desde los secretos (GEMINI_MODEL) o desde la barra lateral.
 # Consulta en Google AI Studio qué modelos tiene disponibles tu nivel gratuito.
 DEFAULT_MODEL = "gemini-3.5-flash-lite"
 
 
 def call_llm(system: str, user: str, api_key: str, model: str = DEFAULT_MODEL,
-             max_tokens: int = 8192, temperature: float | None = None,
+             max_tokens: int = 8192, temperature: float | None = 0.2,
              retries: int = 3) -> str:
     """Devuelve el texto de la respuesta del modelo.
 

@@ -6,11 +6,12 @@ qué cambiaste y por qué. Así cada ejecución registrada queda ligada a una ve
 
 import json
 
+from confidence import assess_confidence
 from correlations import classification_for_prompt, correlations_for_prompt
 from market_data import PROXIES
 from scenarios import PHASES, SCENARIOS, SUPUESTOS
 
-PROMPT_VERSION = "v1.4.1"
+PROMPT_VERSION = "v1.4.2"
 
 SYSTEM_PROMPT = """Eres un analista de riesgos de mercado con experiencia en tests de estrés de carteras. Tu tarea es explicar, de forma cualitativa y rigurosa, cómo un escenario de crisis se transmite a una cartera concreta.
 
@@ -25,9 +26,9 @@ REGLAS OBLIGATORIAS
 6. Incertidumbre: indica tu nivel de confianza y sé honesto sobre lo que el análisis no captura.
 7. No des recomendaciones de inversión ni sugieras comprar, vender o reequilibrar.
 8. Clasificación de activos: usa la clasificación de "clasificacion_activos" en DATOS (función en una crisis y naturaleza del activo). No la cambies ni la amplíes: por ejemplo, no llames activo real o refugio a un activo que DATOS no clasifica así.
-9. Correlaciones y diversificación: si DATOS incluye "correlaciones", estructura "diversificacion" así: (a) primero, di qué refugios de la cartera cumplieron su función en la ventana de estrés y cuáles no, refugio por refugio, con los valores de "refugios" y su mecanismo; no saques conclusiones de la media conjunta si los refugios se comportan de forma distinta; (b) después, di si los activos de riesgo convergieron, con "correlacion_media_entre_riesgo"; (c) por último, comenta los tres primeros pares de "pares_mas_relevantes", en el orden dado, porque están ordenados por su impacto en el riesgo de esta cartera, y explica el mecanismo de cada uno. Escribe las correlaciones con dos decimales, tal como aparecen. No afirmes que todas las correlaciones convergen a 1 si los datos no lo muestran. Si DATOS no incluye correlaciones, escribe en "diversificacion" que no hay datos de correlación disponibles.
-10. Cifras acumuladas: los shocks y las contribuciones de la fase 2 son acumulados desde el inicio del shock e incluyen la fase 1 (lee "definiciones"). Nunca presentes la fase 2 como un impacto adicional que se suma a la fase 1. Para describir lo que ocurre entre fases, usa "diferencia_entre_fases_pp" (por activo) y "diferencia_total_entre_fases_pp" (cartera): si es positiva, hubo una recuperación parcial; si es negativa, la caída se profundizó.
-11. Origen de los datos y confianza: lee "origen_de_los_datos". Cita como base empírica solo la ventana histórica con la que se calibraron los datos; los demás precedentes son contexto, no datos. Si algún activo de la cartera usa un supuesto en lugar de datos de mercado, dilo en "limitaciones". En "justificacion_confianza", explica tu nivel de confianza a partir de ese origen (datos de una sola ventana histórica, representantes cotizados, supuestos) y no lo describas como más sólido de lo que es.
+9. Correlaciones y diversificación: si DATOS incluye "correlaciones", estructura "diversificacion" así: (a) primero, di qué refugios de la cartera cumplieron su función en la ventana de estrés y cuáles no, refugio por refugio, con los valores de "refugios" y su mecanismo; no saques conclusiones de la media conjunta si los refugios se comportan de forma distinta; (b) después, di si los activos de riesgo convergieron, con "correlacion_media_entre_riesgo"; (c) por último, comenta los tres primeros pares de "pares_mas_relevantes", en el orden dado, porque están ordenados por su impacto en el riesgo de esta cartera, y explica en una frase propia el mecanismo de cada uno (no basta con dar las cifras). Escribe las correlaciones con dos decimales, tal como aparecen. No afirmes que todas las correlaciones convergen a 1 si los datos no lo muestran. Si DATOS no incluye correlaciones, escribe en "diversificacion" que no hay datos de correlación disponibles.
+10. Cifras acumuladas: los shocks y las contribuciones de la fase 2 son acumulados desde el inicio del shock e incluyen la fase 1 (lee "definiciones"). Nunca presentes la fase 2 como un impacto adicional que se suma a la fase 1. Para describir lo que ocurre entre fases, usa "diferencia_entre_fases_pp" (por activo) y "diferencia_total_entre_fases_pp" (cartera): si es positiva, hubo una recuperación parcial; si es negativa, la caída se profundizó. Para describir la fase 2, guíate por "movimiento_en_fase_2" de cada activo y "movimiento_cartera_en_fase_2": si dice "recupera", el precio subió durante la fase 2 aunque la cifra acumulada siga siendo negativa; nunca digas en ese caso que el activo o la cartera siguen cayendo o que sus caídas se moderan.
+11. Origen de los datos y confianza: lee "origen_de_los_datos". Cita como base empírica solo la ventana histórica con la que se calibraron los datos; los demás precedentes son contexto, no datos. Si algún activo de la cartera usa un supuesto en lugar de datos de mercado, dilo en "limitaciones". El nivel de confianza lo asignan reglas fijas en "confianza_asignada": escribe en "confianza" exactamente ese nivel y, en "justificacion_confianza", explícalo con sus motivos, sin describir los datos como más sólidos de lo que son.
 12. Lenguaje: en todos los textos, nombra los activos por su nombre en español (el campo "nombre" de la cartera, por ejemplo "Bonos soberanos core"), nunca por su clave interna (como "bonos_core"), y no escribas nombres de campos de DATOS (como "correlacion_media_entre_riesgo"). Las claves solo van en el campo "activo" de "impacto_por_activo".
 
 FORMATO DE RESPUESTA
@@ -101,6 +102,7 @@ def build_user_prompt(portfolio: dict[str, float], scenario_key: str, impacts: d
                 "shock_fase_2_pct": fila["fase_2_shock"],
                 "contribucion_fase_2_pp": fila["fase_2_contrib"],
                 "diferencia_entre_fases_pp": fila["diferencia_entre_fases_pp"],
+                "movimiento_en_fase_2": fila["movimiento_en_fase_2"],
                 "origen": fila["origen"],
             }
             for fila in impacts["filas"]
@@ -108,8 +110,10 @@ def build_user_prompt(portfolio: dict[str, float], scenario_key: str, impacts: d
         "grupos_de_activos": impacts["grupos"],
         "impacto_total_cartera_pct": impacts["totales"],
         "diferencia_total_entre_fases_pp": impacts["diferencia_total_entre_fases_pp"],
+        "movimiento_cartera_en_fase_2": impacts["movimiento_cartera_en_fase_2"],
     }
     datos["clasificacion_activos"] = classification_for_prompt(portfolio)
+    datos["confianza_asignada"] = assess_confidence(impacts, corr)
     if corr:
         datos["correlaciones"] = correlations_for_prompt(corr)
     return (

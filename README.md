@@ -15,6 +15,7 @@ La app separa dos capas. La capa cuantitativa (`scenarios.py` y `engine.py`) cal
 | `prompts.py` | Prompt de sistema y versión del prompt |
 | `llm.py` | Llamada a la API de Google Gemini |
 | `validation.py` | Detector automático de posibles alucinaciones |
+| `confidence.py` | Nivel de confianza asignado por reglas (la IA solo lo justifica) |
 | `market_data.py` | Datos de mercado de Yahoo Finance (ETFs representativos de cada clase) |
 | `correlations.py` | Correlaciones, volatilidad y diversificación en calma frente a estrés |
 | `build_snapshot.py` | Descarga los precios y los guarda en `data/precios.csv` |

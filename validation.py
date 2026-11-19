@@ -6,6 +6,7 @@ revises y, si son errores reales, los documentes en la bitácora.
 
 import re
 
+from confidence import assess_confidence
 from scenarios import ASSET_CLASSES, PHASES, SCENARIOS
 
 REQUIRED_KEYS = [
@@ -27,15 +28,21 @@ def expected_direction(shock: float) -> str:
     return "estable"
 
 
-def _iter_strings(obj):
+# Campos del formato que no son texto para personas (v1.4.2: evita falsos positivos).
+NON_PROSE_KEYS = {"fase", "activo", "direccion_fase_1", "direccion_fase_2", "confianza"}
+
+
+def _iter_strings(obj, prose_only: bool = False):
     if isinstance(obj, str):
         yield obj
     elif isinstance(obj, dict):
-        for value in obj.values():
-            yield from _iter_strings(value)
+        for key, value in obj.items():
+            if prose_only and key in NON_PROSE_KEYS:
+                continue
+            yield from _iter_strings(value, prose_only)
     elif isinstance(obj, list):
         for value in obj:
-            yield from _iter_strings(value)
+            yield from _iter_strings(value, prose_only)
 
 
 def _allowed_numbers(portfolio: dict, scenario_key: str, impacts: dict, corr: dict | None = None) -> set[float]:
@@ -200,25 +207,37 @@ def validate_report(report: dict, portfolio: dict, scenario_key: str, impacts: d
             "detalle": f"La justificación de la confianza cita {', '.join(citados)}, que no se usó para calibrar los datos.",
         })
 
-    # 3f. Confianza alta con activos basados en supuestos (v1.4)
-    supuestos = [f["activo"] for f in impacts["filas"] if f.get("origen") == "supuesto" and f["peso"] > 0]
-    if supuestos and str(report.get("confianza", "")).lower() == "alta":
-        issues.append({
-            "tipo": "confianza_no_justificada",
-            "detalle": f"Declara confianza alta aunque {', '.join(supuestos)} se basa en un supuesto, no en datos de mercado.",
-        })
+    # 3f. Confianza distinta de la asignada por reglas (v1.4.2)
+    asignada = assess_confidence(impacts, corr)["nivel"]
+    dada = str(report.get("confianza", "")).strip().lower()
+    if dada in {"alta", "media", "baja"} and dada != asignada:
+        issues.append({"tipo": "confianza_distinta_de_la_asignada",
+                       "detalle": f"Declara confianza '{dada}', pero las reglas asignan '{asignada}'."})
 
-    # 3g. Claves internas en el texto (v1.4.1): el informe es para personas.
-    textos = {k: v for k, v in report.items() if k != "impacto_por_activo"}
-    textos["mecanismos"] = [i.get("mecanismo", "") for i in report.get("impacto_por_activo", []) if isinstance(i, dict)]
+    # 3g. Claves internas en el texto (v1.4.1; v1.4.2 ignora campos que no son prosa).
     claves = set(ASSET_CLASSES) | {"correlacion_media", "correlacion_media_entre_riesgo",
                                    "correlacion_media_riesgo_refugio", "diferencia_entre_fases_pp",
                                    "pares_mas_relevantes", "fase_1", "fase_2"}
-    encontradas = sorted({w for t in _iter_strings(textos) for w in re.findall(r"[a-zóáéíú_0-9]+_[a-zóáéíú_0-9]+", t)
+    encontradas = sorted({w for t in _iter_strings(report, prose_only=True)
+                          for w in re.findall(r"[a-zóáéíú_0-9]+_[a-zóáéíú_0-9]+", t)
                           if w.replace("ó", "o").replace("á", "a") in claves})
     if encontradas:
         issues.append({"tipo": "claves_internas_en_texto",
                        "detalle": f"El texto usa claves internas en lugar de nombres legibles: {', '.join(encontradas)}."})
+
+    # 3h. Fase 2 descrita como caída cuando la cartera se recupera (v1.4.2)
+    if impacts.get("movimiento_cartera_en_fase_2") == "recupera":
+        patrones = re.compile(r"sigu\w* cayendo|contin[uú]\w* cayendo|contin[uú]\w* (?:bajo|sometid\w* a) (?:la )?presi[oó]n"
+                              r"|ritmo de (?:las )?ca[ií]das|ca[ií]das? se (?:modera|desacelera|suaviza)\w*|se profundiza\w*", re.I)
+        fase2 = [p.get("descripcion", "") for p in report.get("cadena_de_contagio", [])
+                 if isinstance(p, dict) and p.get("fase") == "fase_2"]
+        for texto in fase2 + [str(report.get("resumen_ejecutivo", ""))]:
+            m = patrones.search(texto)
+            if m:
+                issues.append({"tipo": "movimiento_fase_2_contradictorio",
+                               "detalle": f"Dice «{m.group(0)}» en la fase 2, pero la cartera se recupera "
+                                          f"({impacts['diferencia_total_entre_fases_pp']:+.2f} pp entre fases)."})
+                break
 
     # 4. Confianza
     if str(report.get("confianza", "")).lower() not in {"alta", "media", "baja"}:

@@ -4,6 +4,15 @@ from market_data import PROXIES
 from scenarios import ASSET_CLASSES, ASSET_GROUPS, PHASES, SCENARIOS, SIN_VARIACION
 
 
+def movimiento(diferencia_pp: float) -> str:
+    """Qué hace el activo (o la cartera) entre el final de la fase 1 y el de la fase 2 (v1.4.2)."""
+    if diferencia_pp >= 1:
+        return "recupera"
+    if diferencia_pp <= -1:
+        return "cae más"
+    return "se mantiene"
+
+
 def compute_impacts(portfolio: dict[str, float], scenario_key: str) -> dict:
     """Aplica los shocks del escenario a una cartera.
 
@@ -26,6 +35,7 @@ def compute_impacts(portfolio: dict[str, float], scenario_key: str) -> dict:
         # v1.4: las cifras son acumuladas; esta diferencia (en puntos) es lo que pasa
         # entre el final de la fase 1 y el de la fase 2. Positiva: recuperación parcial.
         fila["diferencia_entre_fases_pp"] = round(fila["fase_2_shock"] - fila["fase_1_shock"], 1)
+        fila["movimiento_en_fase_2"] = movimiento(fila["diferencia_entre_fases_pp"])
         fila["origen"] = ("calibrado" if activo in PROXIES
                           else "sin variación por definición" if activo in SIN_VARIACION else "supuesto")
         filas.append(fila)
@@ -45,4 +55,5 @@ def compute_impacts(portfolio: dict[str, float], scenario_key: str) -> dict:
         "grupos": grupos,
         "totales": totales,
         "diferencia_total_entre_fases_pp": round(totales["fase_2"] - totales["fase_1"], 2),
+        "movimiento_cartera_en_fase_2": movimiento(totales["fase_2"] - totales["fase_1"]),
     }

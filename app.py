@@ -198,7 +198,7 @@ def render_report(run: dict, scenario_key: str, portfolio: dict) -> None:
         for s in report.get("limitaciones", []):
             st.markdown(f"- {s}")
 
-    st.markdown(f"**Confianza del modelo:** {report.get('confianza', '?')}. {report.get('justificacion_confianza', '')}")
+    st.markdown(f"**Confianza (nivel asignado por reglas):** {report.get('confianza', '?')}. {report.get('justificacion_confianza', '')}")
 
     with st.expander("Ver el prompt enviado y la respuesta en bruto"):
         st.markdown("**Mensaje con los datos**")
