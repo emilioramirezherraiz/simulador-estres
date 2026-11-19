@@ -47,6 +47,9 @@ def _allowed_numbers(portfolio: dict, scenario_key: str, impacts: dict, corr: di
     for fila in impacts["filas"]:
         for fase in PHASES:
             allowed.add(abs(float(fila[f"{fase}_contrib"])))
+        allowed.add(abs(float(fila.get("diferencia_entre_fases_pp", 0))))
+    # v1.4: diferencia entre fases de la cartera
+    allowed.add(abs(float(impacts.get("diferencia_total_entre_fases_pp", 0))))
     # v1.1: también son legítimas las agregaciones por grupo calculadas en engine.py
     for grupo in impacts.get("grupos", {}).values():
         allowed.update(abs(float(v)) for v in grupo.values())
@@ -70,7 +73,34 @@ def _allowed_correlations(corr: dict | None) -> set[float]:
             if corr[periodo].get(clave) is not None:
                 values.add(abs(float(corr[periodo][clave])))
     values.update(abs(float(c["cambio"])) for c in corr["pares_mas_relevantes"])
+    for r in corr.get("refugios", {}).values():  # v1.4
+        values.update(abs(float(v)) for k, v in r.items() if not isinstance(v, bool))
     return values
+
+
+SENTENCE_RE = re.compile(r"[^.;]+(?:\.(?=\d)[^.;]*)*")
+GENERIC_WORDS = {"Quiebra", "Crisis", "Colapso", "Crash", "Desanclaje", "Invasión", "Europa"}
+
+
+def _number_variants(x: float) -> set[str]:
+    out = set()
+    for d in (2, 1):
+        t = f"{abs(x):.{d}f}"
+        out.update({t, t.replace(".", ",")})
+    return out
+
+
+def _context_keywords(scenario_key: str) -> set[str]:
+    """Palabras distintivas de los precedentes que no se usaron para calibrar."""
+    sc = SCENARIOS[scenario_key]
+    words = set()
+    for p in sc["precedentes"]:
+        if p == sc.get("precedente_calibracion"):
+            continue
+        for w in re.findall(r"[A-Za-zÁÉÍÓÚÑáéíóúñ0-9/]+", p):
+            if (w[0].isupper() and len(w) >= 4 and w not in GENERIC_WORDS) or w.isupper() or re.fullmatch(r"19\d\d", w):
+                words.add(w)
+    return words
 
 
 def validate_report(report: dict, portfolio: dict, scenario_key: str, impacts: dict,
@@ -149,6 +179,34 @@ def validate_report(report: dict, portfolio: dict, scenario_key: str, impacts: d
                     "tipo": "omision_relevante",
                     "detalle": f"'diversificacion' no comenta el par {par['par']}, uno de los tres con más impacto en el riesgo de la cartera ({par['impacto_en_varianza_pct']} % de la varianza).",
                 })
+
+    # 3d. Fase 2 leída como adicional (v1.4): las cifras son acumuladas.
+    fase2 = _number_variants(impacts["totales"]["fase_2"])
+    for text in _iter_strings(report):
+        for frase in SENTENCE_RE.findall(text):
+            if "adicional" in frase.lower() and any(v in frase for v in fase2):
+                issues.append({
+                    "tipo": "fase_acumulada_mal_leida",
+                    "detalle": f"Presenta la fase 2 como adicional, pero es acumulada: «{frase.strip()[:160]}».",
+                })
+                break
+
+    # 3e. Precedentes de contexto citados como base de la confianza (v1.4)
+    justif = str(report.get("justificacion_confianza", ""))
+    citados = sorted(w for w in _context_keywords(scenario_key) if w in justif)
+    if citados:
+        issues.append({
+            "tipo": "base_empirica_inventada",
+            "detalle": f"La justificación de la confianza cita {', '.join(citados)}, que no se usó para calibrar los datos.",
+        })
+
+    # 3f. Confianza alta con activos basados en supuestos (v1.4)
+    supuestos = [f["activo"] for f in impacts["filas"] if f.get("origen") == "supuesto" and f["peso"] > 0]
+    if supuestos and str(report.get("confianza", "")).lower() == "alta":
+        issues.append({
+            "tipo": "confianza_no_justificada",
+            "detalle": f"Declara confianza alta aunque {', '.join(supuestos)} se basa en un supuesto, no en datos de mercado.",
+        })
 
     # 4. Confianza
     if str(report.get("confianza", "")).lower() not in {"alta", "media", "baja"}:

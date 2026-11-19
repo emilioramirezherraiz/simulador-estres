@@ -4,12 +4,13 @@ Herramienta web que aplica un escenario de crisis a una cartera y genera, con un
 
 ## Cómo funciona
 
-La app separa dos capas. La capa cuantitativa (`scenarios.py` y `engine.py`) calcula el impacto con una tabla de sensibilidades definida a mano, sin IA. La capa narrativa (`prompts.py` y `llm.py`) envía esos datos al modelo, que solo tiene que explicarlos. Después, `validation.py` revisa el informe y marca posibles alucinaciones: direcciones que contradicen los datos, cifras inventadas, activos que no están en la cartera o campos que faltan.
+La app separa dos capas. La capa cuantitativa (`scenarios.py` y `engine.py`) calcula el impacto sin IA, con shocks calibrados con precios reales en la ventana histórica de cada escenario. La capa narrativa (`prompts.py` y `llm.py`) envía esos datos al modelo, que solo tiene que explicarlos. Después, `validation.py` revisa el informe y marca posibles alucinaciones: direcciones que contradicen los datos, cifras inventadas, activos que no están en la cartera o campos que faltan.
 
 | Archivo | Función |
 |---|---|
 | `app.py` | Interfaz en Streamlit |
-| `scenarios.py` | Escenarios, clases de activo y shocks por fase (cifras ilustrativas, revísalas) |
+| `scenarios.py` | Escenarios, fases con fechas y shocks calibrados con precios reales |
+| `calibrate.py` | Comprueba los shocks contra `data/precios.csv` y los compara con las cifras ilustrativas de la v1.0 |
 | `engine.py` | Cálculo del impacto en la cartera |
 | `prompts.py` | Prompt de sistema y versión del prompt |
 | `llm.py` | Llamada a la API de Google Gemini |

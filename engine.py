@@ -1,6 +1,7 @@
 """Cálculo determinista del impacto (sin IA)."""
 
-from scenarios import ASSET_CLASSES, ASSET_GROUPS, PHASES, SCENARIOS
+from market_data import PROXIES
+from scenarios import ASSET_CLASSES, ASSET_GROUPS, PHASES, SCENARIOS, SIN_VARIACION
 
 
 def compute_impacts(portfolio: dict[str, float], scenario_key: str) -> dict:
@@ -22,6 +23,11 @@ def compute_impacts(portfolio: dict[str, float], scenario_key: str) -> dict:
             fila[f"{fase}_shock"] = shock
             fila[f"{fase}_contrib"] = round(contribucion, 2)
             totales[fase] += contribucion
+        # v1.4: las cifras son acumuladas; esta diferencia (en puntos) es lo que pasa
+        # entre el final de la fase 1 y el de la fase 2. Positiva: recuperación parcial.
+        fila["diferencia_entre_fases_pp"] = round(fila["fase_2_shock"] - fila["fase_1_shock"], 1)
+        fila["origen"] = ("calibrado" if activo in PROXIES
+                          else "sin variación por definición" if activo in SIN_VARIACION else "supuesto")
         filas.append(fila)
 
     grupos = {}
@@ -33,8 +39,10 @@ def compute_impacts(portfolio: dict[str, float], scenario_key: str) -> dict:
                 **{f"{fase}_contrib": round(sum(f[f"{fase}_contrib"] for f in presentes), 2) for fase in PHASES},
             }
 
+    totales = {fase: round(valor, 2) for fase, valor in totales.items()}
     return {
         "filas": filas,
         "grupos": grupos,
-        "totales": {fase: round(valor, 2) for fase, valor in totales.items()},
+        "totales": totales,
+        "diferencia_total_entre_fases_pp": round(totales["fase_2"] - totales["fase_1"], 2),
     }

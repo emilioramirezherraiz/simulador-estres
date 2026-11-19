@@ -1,11 +1,13 @@
 """Escenarios de estrés y tabla de sensibilidades.
 
-IMPORTANTE: las cifras de esta versión son ILUSTRATIVAS (v0). Antes de
-entregar, revisa cada una y justifícala con datos del episodio histórico de
-referencia (y documenta en la bitácora de dónde sale cada número).
+v1.4: los shocks están CALIBRADOS con precios reales (data/precios.csv) en la
+ventana histórica de cada escenario. Los calcula calibrate.py; si cambias las
+fechas o los datos, ejecuta `python calibrate.py` y copia aquí lo que imprima.
+Las clases sin precio de mercado útil (stablecoins y liquidez) son SUPUESTOS,
+justificados en SUPUESTOS.
 
-Cada cifra es la variación ACUMULADA (%) del precio de la clase de activo
-desde el inicio del shock hasta el final de la fase indicada.
+Cada cifra es la variación ACUMULADA (%) del precio desde el inicio del shock
+hasta el final de la fase: la fase 2 incluye la fase 1, no se suma a ella.
 """
 
 ASSET_CLASSES = {
@@ -22,9 +24,21 @@ ASSET_CLASSES = {
 }
 
 PHASES = {
-    "fase_1": "Fase 1: impacto inmediato (0 a 2 semanas)",
-    "fase_2": "Fase 2: reajuste (1 a 6 meses)",
+    "fase_1": "Fase 1: impacto inmediato",
+    "fase_2": "Fase 2: reajuste",
 }
+
+# Activos cuyos shocks no salen de precios de mercado, con su justificación (v1.4).
+SUPUESTOS = {
+    "stablecoins": (
+        "Supuesto: su precio está anclado a 1 dólar, así que no hay una serie de precios útil. "
+        "En el escenario de stablecoins se supone una pérdida para una cesta de stablecoins "
+        "en un colapso más amplio que el de Terra/UST (que perdió casi todo su valor mientras "
+        "las grandes mantuvieron casi la paridad); en los demás, que mantienen la paridad."
+    ),
+}
+# El efectivo no cambia de precio por definición: no es un supuesto que discutir.
+SIN_VARIACION = {"liquidez"}
 
 # Etiquetas cortas para tablas y gráficos.
 ASSET_SHORT = {
@@ -74,6 +88,7 @@ SCENARIOS = {
             "pánico se extiende al resto del ecosistema cripto, con reembolsos "
             "masivos y ventas forzadas de las reservas que las respaldan."
         ),
+        "precedente_calibracion": "Colapso de Terra/UST (mayo de 2022)",
         "precedentes": [
             "Colapso de Terra/UST (mayo de 2022)",
             "Quiebra de FTX (noviembre de 2022)",
@@ -88,16 +103,20 @@ SCENARIOS = {
             "inicio": "2022-05-01", "fin": "2022-06-30",
             "justificacion": "Colapso de Terra/UST y contagio posterior en el ecosistema cripto.",
         },
+        "fases": {
+            "fase_1": {"fin": "2022-05-12", "hito": "UST pierde la paridad y Terra colapsa"},
+            "fase_2": {"fin": "2022-06-30", "hito": "contagio a prestamistas cripto y mínimo de bitcoin"},
+        },
         "shocks": {
             "fase_1": {
-                "rv_desarrollada": -6, "rv_emergente": -8, "bonos_core": 0,
-                "high_yield": -4, "inmobiliario": -5, "oro": 1, "petroleo": -3,
-                "bitcoin": -40, "stablecoins": -20, "liquidez": 0,
+                "rv_desarrollada": -5.3, "rv_emergente": -6.9, "bonos_core": 1.2, "high_yield": -1.9,
+                "inmobiliario": -7.0, "oro": -2.0, "petroleo": 1.1, "bitcoin": -24.6,
+                "stablecoins": -20, "liquidez": 0,
             },
             "fase_2": {
-                "rv_desarrollada": -10, "rv_emergente": -14, "bonos_core": 3,
-                "high_yield": -7, "inmobiliario": -9, "oro": 5, "petroleo": -6,
-                "bitcoin": -55, "stablecoins": -30, "liquidez": 0,
+                "rv_desarrollada": -8.6, "rv_emergente": -4.4, "bonos_core": 0.5, "high_yield": -5.5,
+                "inmobiliario": -9.6, "oro": -3.0, "petroleo": 2.5, "bitcoin": -48.7,
+                "stablecoins": -30, "liquidez": 0,
             },
         },
     },
@@ -108,6 +127,7 @@ SCENARIOS = {
             "y del gas. La inflación repunta y los bancos centrales endurecen la "
             "política monetaria pese al deterioro del crecimiento."
         ),
+        "precedente_calibracion": "Invasión de Ucrania y crisis del gas en Europa (2022)",
         "precedentes": [
             "Crisis del petróleo de 1973",
             "Invasión de Ucrania y crisis del gas en Europa (2022)",
@@ -122,16 +142,20 @@ SCENARIOS = {
             "inicio": "2022-02-24", "fin": "2022-10-31",
             "justificacion": "Invasión de Ucrania, escalada de los precios de la energía y subidas de tipos.",
         },
+        "fases": {
+            "fase_1": {"fin": "2022-03-08", "hito": "máximo del petróleo tras la invasión"},
+            "fase_2": {"fin": "2022-10-31", "hito": "subidas de tipos y caída conjunta de bolsa y bonos hasta octubre de 2022"},
+        },
         "shocks": {
             "fase_1": {
-                "rv_desarrollada": -8, "rv_emergente": -10, "bonos_core": -4,
-                "high_yield": -5, "inmobiliario": -7, "oro": 3, "petroleo": 40,
-                "bitcoin": -15, "stablecoins": 0, "liquidez": 0,
+                "rv_desarrollada": -2.8, "rv_emergente": -7.3, "bonos_core": 0.9, "high_yield": -1.6,
+                "inmobiliario": 1.0, "oro": 8.1, "petroleo": 28.8, "bitcoin": 1.1,
+                "stablecoins": 0, "liquidez": 0,
             },
             "fase_2": {
-                "rv_desarrollada": -15, "rv_emergente": -18, "bonos_core": -10,
-                "high_yield": -10, "inmobiliario": -18, "oro": 2, "petroleo": 25,
-                "bitcoin": -35, "stablecoins": 0, "liquidez": 0,
+                "rv_desarrollada": -8.8, "rv_emergente": -25.8, "bonos_core": -13.9, "high_yield": -8.6,
+                "inmobiliario": -16.5, "oro": -14.2, "petroleo": 7.8, "bitcoin": -46.5,
+                "stablecoins": 0, "liquidez": 0,
             },
         },
     },
@@ -142,6 +166,7 @@ SCENARIOS = {
             "Los inversores venden lo que pueden, no lo que quieren, hasta que los "
             "bancos centrales intervienen."
         ),
+        "precedente_calibracion": "Crash por la COVID-19 (marzo de 2020)",
         "precedentes": [
             "Quiebra de Lehman Brothers (septiembre de 2008)",
             "Crash por la COVID-19 (marzo de 2020)",
@@ -152,20 +177,24 @@ SCENARIOS = {
             "Caída brusca de la demanda esperada",
             "Intervención posterior de bancos centrales y gobiernos",
         ],
+        "fases": {
+            "fase_1": {"fin": "2020-03-23", "hito": "mínimo de la bolsa y anuncio de compras ilimitadas de la Reserva Federal"},
+            "fase_2": {"fin": "2020-04-30", "hito": "estabilización tras la intervención"},
+        },
         "ventana_estres": {
             "inicio": "2020-02-19", "fin": "2020-04-30",
             "justificacion": "Crash por la COVID-19: del máximo del S&P 500 a la estabilización tras la intervención de la Reserva Federal.",
         },
         "shocks": {
             "fase_1": {
-                "rv_desarrollada": -30, "rv_emergente": -32, "bonos_core": 3,
-                "high_yield": -20, "inmobiliario": -38, "oro": -8, "petroleo": -50,
-                "bitcoin": -45, "stablecoins": -1, "liquidez": 0,
+                "rv_desarrollada": -33.7, "rv_emergente": -30.8, "bonos_core": 6.4, "high_yield": -21.9,
+                "inmobiliario": -41.5, "oro": -3.6, "petroleo": -56.4, "bitcoin": -33.4,
+                "stablecoins": -1, "liquidez": 0,
             },
             "fase_2": {
-                "rv_desarrollada": -15, "rv_emergente": -20, "bonos_core": 6,
-                "high_yield": -10, "inmobiliario": -20, "oro": 8, "petroleo": -30,
-                "bitcoin": -20, "stablecoins": 0, "liquidez": 0,
+                "rv_desarrollada": -13.6, "rv_emergente": -17.2, "bonos_core": 7.5, "high_yield": -8.0,
+                "inmobiliario": -21.8, "oro": 4.6, "petroleo": -78.6, "bitcoin": -10.1,
+                "stablecoins": 0, "liquidez": 0,
             },
         },
     },

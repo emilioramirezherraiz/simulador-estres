@@ -14,7 +14,8 @@ from engine import compute_impacts
 from llm import DEFAULT_MODEL, call_llm, parse_json
 from prompts import PROMPT_VERSION, SYSTEM_PROMPT, build_user_prompt
 from market_data import load_prices
-from scenarios import ASSET_CLASSES, ASSET_SHORT, PHASES, SCENARIOS
+from market_data import PROXIES
+from scenarios import ASSET_CLASSES, ASSET_SHORT, PHASES, SCENARIOS, SUPUESTOS
 from validation import validate_report
 
 LOG_PATH = Path("logs/runs.jsonl")
@@ -99,6 +100,17 @@ def render_correlations(corr: dict | None, fuente: str) -> None:
               f"{corr['estres']['ratio_diversificacion'] - corr['calma']['ratio_diversificacion']:+.2f} frente a calma",
               help="Media ponderada de las volatilidades dividida entre la volatilidad de la cartera. "
                    "Cuanto más cerca de 1, menos beneficio aporta la diversificación.")
+    if corr.get("refugios"):
+        st.markdown("**¿Funcionaron los refugios?**")
+        st.caption("Correlación media de cada refugio con los activos de riesgo de la cartera. "
+                   "Se considera que cumple su función si en estrés no sube y queda por debajo de 0,10.")
+        st.dataframe(
+            pd.DataFrame([{"Refugio": ASSET_SHORT[r], "Calma": v["correlacion_media_con_riesgo_calma"],
+                           "Estrés": v["correlacion_media_con_riesgo_estres"], "Cambio": v["cambio"],
+                           "Cumple su función": "Sí" if v["cumple_funcion_de_refugio"] else "No"}
+                          for r, v in corr["refugios"].items()]),
+            hide_index=True, width="stretch",
+        )
     h1, h2 = st.columns(2)
     h1.altair_chart(heatmap(corr["calma"]["matriz"], "Calma"), width="stretch")
     h2.altair_chart(heatmap(corr["estres"]["matriz"], "Estrés"), width="stretch")
@@ -255,7 +267,13 @@ with col_right:
         st.markdown("**Canales de transmisión**")
         st.markdown("\n".join(f"- {c}" for c in sc["canales"]))
         st.markdown("**Precedentes históricos**")
-        st.markdown("\n".join(f"- {p}" for p in sc["precedentes"]))
+        st.markdown("\n".join(
+            f"- {p}" + (" (usado para calibrar los datos)" if p == sc["precedente_calibracion"] else "")
+            for p in sc["precedentes"]))
+        st.markdown("**Fases**")
+        st.markdown("\n".join(
+            f"- {PHASES[f]}: del {sc['ventana_estres']['inicio']} al {sc['fases'][f]['fin']} ({sc['fases'][f]['hito']})"
+            for f in PHASES))
 
 st.divider()
 st.subheader("3. Impacto estimado")
@@ -267,8 +285,11 @@ if not weights_ok or not portfolio:
 impacts = compute_impacts(portfolio, scenario_key)
 
 m1, m2 = st.columns(2)
-m1.metric(PHASES["fase_1"], f"{impacts['totales']['fase_1']:+.2f} %")
-m2.metric(PHASES["fase_2"], f"{impacts['totales']['fase_2']:+.2f} %")
+m1.metric(PHASES["fase_1"], f"{impacts['totales']['fase_1']:+.2f} %",
+          help=f"Del {sc['ventana_estres']['inicio']} al {sc['fases']['fase_1']['fin']}.")
+m2.metric(PHASES["fase_2"], f"{impacts['totales']['fase_2']:+.2f} %",
+          f"{impacts['diferencia_total_entre_fases_pp']:+.2f} pp frente a la fase 1",
+          help=f"Acumulado del {sc['ventana_estres']['inicio']} al {sc['fases']['fase_2']['fin']}; incluye la fase 1.")
 
 tabla = pd.DataFrame([
     {
@@ -278,11 +299,19 @@ tabla = pd.DataFrame([
         "Contribución fase 1 (pp)": f["fase_1_contrib"],
         "Shock fase 2 (%)": f["fase_2_shock"],
         "Contribución fase 2 (pp)": f["fase_2_contrib"],
+        "Origen": f["origen"],
     }
     for f in impacts["filas"]
 ])
 st.dataframe(tabla, hide_index=True, width="stretch")
-st.caption("Calculado sin IA a partir de la tabla de sensibilidades del escenario (scenarios.py). Variación acumulada desde el inicio del shock.")
+st.caption(
+    f"Calculado sin IA. Shocks calibrados con precios reales de {', '.join(PROXIES.values())} "
+    f"en la ventana {sc['ventana_estres']['inicio']} a {sc['ventana_estres']['fin']} "
+    f"({sc['precedente_calibracion']}). Cifras acumuladas desde el inicio del shock: la fase 2 incluye la fase 1."
+)
+for a in portfolio:
+    if a in SUPUESTOS:
+        st.caption(f"{ASSET_CLASSES[a]}: {SUPUESTOS[a]}")
 
 prices, fuente = get_prices()
 corr = compute_correlations(prices, portfolio, scenario_key)

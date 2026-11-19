@@ -1,4 +1,4 @@
-"""Correlaciones en calma frente a estrés (v1.3).
+"""Correlaciones en calma frente a estrés (v1.4).
 
 Compara el comportamiento conjunto de los activos de la cartera en un periodo
 tranquilo y en la ventana histórica de crisis de cada escenario. Todo se
@@ -101,6 +101,23 @@ def compute_correlations(prices: pd.DataFrame | None, portfolio: dict[str, float
         })
     relevantes.sort(key=lambda x: abs(x["impacto_en_varianza_pct"]), reverse=True)
 
+    # v1.4: cada refugio por separado, porque la media conjunta puede esconder
+    # que uno protege y otro no (en 2020 los bonos protegieron y el oro no).
+    riesgo = [a for a in activos if ASSET_ROLE[a] == "riesgo"]
+    refugios = {}
+    for r in (a for a in activos if ASSET_ROLE[a] == "refugio"):
+        if not riesgo:
+            break
+        c0 = _mean_corr(calma["matriz"], [(r, x) for x in riesgo])
+        c1 = _mean_corr(estres["matriz"], [(r, x) for x in riesgo])
+        if c0 is not None and c1 is not None:
+            refugios[r] = {
+                "correlacion_media_con_riesgo_calma": c0,
+                "correlacion_media_con_riesgo_estres": c1,
+                "cambio": round(c1 - c0, 2),
+                "cumple_funcion_de_refugio": c1 <= c0 and c1 < 0.1,
+            }
+
     for st in (calma, estres):
         st.pop("_vols"), st.pop("_var")
     return {
@@ -113,6 +130,7 @@ def compute_correlations(prices: pd.DataFrame | None, portfolio: dict[str, float
         "calma": calma,
         "estres": estres,
         "pares_mas_relevantes": relevantes[:TOP_PAIRS],
+        "refugios": refugios,
     }
 
 
@@ -131,6 +149,11 @@ def correlations_for_prompt(corr: dict) -> dict:
         "peso_de_la_cartera_cubierto_pct": corr["peso_cubierto_pct"],
         "calma": stats(corr["calma"]),
         "estres": stats(corr["estres"]),
+        "refugios": {
+            "criterio": "correlación media de cada refugio con los activos de riesgo de la cartera; "
+                        "cumple su función si en estrés no sube y queda por debajo de 0.10",
+            "detalle": corr["refugios"],
+        },
         "pares_mas_relevantes": {
             "criterio": "ordenados por el impacto del cambio de correlación en la varianza de la cartera en estrés; "
                         "impacto positivo aumenta el riesgo, negativo lo reduce",
