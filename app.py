@@ -130,6 +130,8 @@ def render_report(run: dict, scenario_key: str, portfolio: dict) -> None:
     st.caption(
         f"Informe para «{SCENARIOS[run['escenario']]['nombre']}», "
         f"modelo {run['modelo']}, prompt {run['prompt_version']}, {run['timestamp']}"
+        + (f". Hicieron falta {run['intentos']} intentos porque la primera respuesta no era un JSON válido."
+           if run.get("intentos", 1) > 1 else "")
     )
 
     issues = run["incidencias"]
@@ -143,7 +145,7 @@ def render_report(run: dict, scenario_key: str, portfolio: dict) -> None:
     report = run["informe"]
     if report is None:
         st.error("La respuesta del modelo no es un JSON válido. Texto recibido:")
-        st.code(run["respuesta_bruta"])
+        st.code(run["respuesta_bruta"], line_numbers=True)
         return
 
     st.markdown("#### Resumen ejecutivo")
@@ -291,19 +293,21 @@ st.subheader("4. Informe narrativo")
 
 if st.button("Generar informe", type="primary", disabled=not api_key):
     user_prompt = build_user_prompt(portfolio, scenario_key, impacts, corr)
-    with st.spinner("Generando el informe..."):
+    report, raw, issues, intentos = None, "", [], 0
+    for intentos in (1, 2):  # si la respuesta no es un JSON válido, se pide una vez más
+        with st.spinner("Generando el informe..." if intentos == 1 else "Respuesta mal formada, generando de nuevo..."):
+            try:
+                raw = call_llm(SYSTEM_PROMPT, user_prompt, api_key=api_key, model=model)
+            except Exception as e:  # noqa: BLE001
+                st.error(f"La llamada a la API ha fallado: {e}")
+                st.stop()
         try:
-            raw = call_llm(SYSTEM_PROMPT, user_prompt, api_key=api_key, model=model)
+            report = parse_json(raw)
+            issues = validate_report(report, portfolio, scenario_key, impacts, corr)
+            break
         except Exception as e:  # noqa: BLE001
-            st.error(f"La llamada a la API ha fallado: {e}")
-            st.stop()
-
-    try:
-        report = parse_json(raw)
-        issues = validate_report(report, portfolio, scenario_key, impacts, corr)
-    except Exception as e:  # noqa: BLE001
-        report = None
-        issues = [{"tipo": "json_invalido", "detalle": str(e)}]
+            report = None
+            issues = [{"tipo": "json_invalido", "detalle": f"{e} (intento {intentos} de 2)"}]
 
     run = {
         "timestamp": dt.datetime.now().isoformat(timespec="seconds"),
@@ -315,6 +319,7 @@ if st.button("Generar informe", type="primary", disabled=not api_key):
         "correlaciones_medias": ({p: {k: corr[p][k] for k in ("correlacion_media", "correlacion_media_entre_riesgo",
                                                          "correlacion_media_riesgo_refugio")}
                                  for p in ("calma", "estres")} if corr else None),
+        "intentos": intentos,
         "n_incidencias": len(issues),
         "incidencias": issues,
         "informe": report,

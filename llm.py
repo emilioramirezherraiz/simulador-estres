@@ -49,12 +49,21 @@ def call_llm(system: str, user: str, api_key: str, model: str = DEFAULT_MODEL,
 
 
 def parse_json(text: str) -> dict:
-    """Extrae el JSON aunque el modelo añada bloques de código o texto alrededor."""
+    """Extrae el JSON aunque el modelo añada bloques de código o texto alrededor.
+
+    También tolera comas sobrantes antes de cerrar llaves o corchetes, un error
+    frecuente en modelos ligeros con respuestas largas.
+    """
     clean = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip())
-    try:
-        return json.loads(clean)
-    except json.JSONDecodeError:
-        match = re.search(r"\{.*\}", clean, re.DOTALL)
-        if match:
-            return json.loads(match.group(0))
-        raise
+    candidates = [clean]
+    match = re.search(r"\{.*\}", clean, re.DOTALL)
+    if match:
+        candidates.append(match.group(0))
+    error = None
+    for candidate in candidates:
+        for version in (candidate, re.sub(r",\s*([}\]])", r"\1", candidate)):
+            try:
+                return json.loads(version)
+            except json.JSONDecodeError as e:
+                error = error or e
+    raise error
