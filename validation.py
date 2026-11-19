@@ -6,7 +6,7 @@ revises y, si son errores reales, los documentes en la bitácora.
 
 import re
 
-from scenarios import PHASES, SCENARIOS
+from scenarios import ASSET_CLASSES, PHASES, SCENARIOS
 
 REQUIRED_KEYS = [
     "resumen_ejecutivo", "cadena_de_contagio", "impacto_por_activo", "diversificacion",
@@ -207,6 +207,18 @@ def validate_report(report: dict, portfolio: dict, scenario_key: str, impacts: d
             "tipo": "confianza_no_justificada",
             "detalle": f"Declara confianza alta aunque {', '.join(supuestos)} se basa en un supuesto, no en datos de mercado.",
         })
+
+    # 3g. Claves internas en el texto (v1.4.1): el informe es para personas.
+    textos = {k: v for k, v in report.items() if k != "impacto_por_activo"}
+    textos["mecanismos"] = [i.get("mecanismo", "") for i in report.get("impacto_por_activo", []) if isinstance(i, dict)]
+    claves = set(ASSET_CLASSES) | {"correlacion_media", "correlacion_media_entre_riesgo",
+                                   "correlacion_media_riesgo_refugio", "diferencia_entre_fases_pp",
+                                   "pares_mas_relevantes", "fase_1", "fase_2"}
+    encontradas = sorted({w for t in _iter_strings(textos) for w in re.findall(r"[a-zóáéíú_0-9]+_[a-zóáéíú_0-9]+", t)
+                          if w.replace("ó", "o").replace("á", "a") in claves})
+    if encontradas:
+        issues.append({"tipo": "claves_internas_en_texto",
+                       "detalle": f"El texto usa claves internas en lugar de nombres legibles: {', '.join(encontradas)}."})
 
     # 4. Confianza
     if str(report.get("confianza", "")).lower() not in {"alta", "media", "baja"}:

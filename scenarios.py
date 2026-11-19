@@ -172,7 +172,7 @@ SCENARIOS = {
             "Crash por la COVID-19 (marzo de 2020)",
         ],
         "canales": [
-            "Llamadas de margen que fuerzan la venta incluso de activos refugio",
+            "Llamadas de margen que obligan a vender lo que tiene liquidez, incluidos algunos activos considerados refugio",
             "Ampliación de diferenciales de crédito y cierre del mercado de financiación",
             "Caída brusca de la demanda esperada",
             "Intervención posterior de bancos centrales y gobiernos",

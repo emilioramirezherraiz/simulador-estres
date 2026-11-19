@@ -166,7 +166,8 @@ def render_report(run: dict, scenario_key: str, portfolio: dict) -> None:
     st.markdown("#### Cadena de contagio")
     for paso in report.get("cadena_de_contagio", []):
         fase = PHASES.get(paso.get("fase"), paso.get("fase", ""))
-        st.markdown(f"**{fase}. {paso.get('titulo', '')}**")
+        titulo = str(paso.get("titulo", "")).strip()
+        st.markdown(f"**{fase}**" if not titulo or titulo.lower() in fase.lower() else f"**{fase}. {titulo}**")
         st.write(paso.get("descripcion", ""))
 
     st.markdown("#### Impacto por activo")
