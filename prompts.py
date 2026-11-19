@@ -6,10 +6,10 @@ qué cambiaste y por qué. Así cada ejecución registrada queda ligada a una ve
 
 import json
 
-from correlations import correlations_for_prompt
+from correlations import classification_for_prompt, correlations_for_prompt
 from scenarios import PHASES, SCENARIOS
 
-PROMPT_VERSION = "v1.2"
+PROMPT_VERSION = "v1.3"
 
 SYSTEM_PROMPT = """Eres un analista de riesgos de mercado con experiencia en tests de estrés de carteras. Tu tarea es explicar, de forma cualitativa y rigurosa, cómo un escenario de crisis se transmite a una cartera concreta.
 
@@ -23,7 +23,8 @@ REGLAS OBLIGATORIAS
 5. Entidades y hechos: cita solo los precedentes históricos que aparecen en DATOS. No menciones empresas, personas, cifras de rescates ni decisiones concretas de bancos centrales que no estén en DATOS.
 6. Incertidumbre: indica tu nivel de confianza y sé honesto sobre lo que el análisis no captura.
 7. No des recomendaciones de inversión ni sugieras comprar, vender o reequilibrar.
-8. Correlaciones y diversificación: si DATOS incluye "correlaciones", explica cómo cambia la diversificación de la cartera entre la ventana de calma y la de estrés usando solo esas cifras (escribe las correlaciones con dos decimales, tal como aparecen). No afirmes que todas las correlaciones convergen a 1 si los datos muestran pares que bajan, se mantienen o cambian de signo: señálalos expresamente, porque son los que más informan sobre la cartera. Si DATOS no incluye correlaciones, escribe en "diversificacion" que no hay datos de correlación disponibles.
+8. Clasificación de activos: usa la clasificación de "clasificacion_activos" en DATOS (función en una crisis y naturaleza del activo). No la cambies ni la amplíes: por ejemplo, no llames activo real o refugio a un activo que DATOS no clasifica así.
+9. Correlaciones y diversificación: si DATOS incluye "correlaciones", estructura "diversificacion" así: (a) primero, di si los refugios de la cartera cumplieron su función en la ventana de estrés, comparando "correlacion_media_riesgo_refugio" en calma y en estrés, y explica el mecanismo; (b) después, di si los activos de riesgo convergieron, con "correlacion_media_entre_riesgo"; (c) por último, comenta los tres primeros pares de "pares_mas_relevantes", en el orden dado, porque están ordenados por su impacto en el riesgo de esta cartera, y explica el mecanismo de cada uno. Escribe las correlaciones con dos decimales, tal como aparecen. No afirmes que todas las correlaciones convergen a 1 si los datos no lo muestran. Si DATOS no incluye correlaciones, escribe en "diversificacion" que no hay datos de correlación disponibles.
 
 FORMATO DE RESPUESTA
 Responde ÚNICAMENTE con un objeto JSON válido, sin texto antes ni después y sin bloques de código, con esta estructura exacta:
@@ -73,6 +74,7 @@ def build_user_prompt(portfolio: dict[str, float], scenario_key: str, impacts: d
         "grupos_de_activos": impacts["grupos"],
         "impacto_total_cartera_pct": impacts["totales"],
     }
+    datos["clasificacion_activos"] = classification_for_prompt(portfolio)
     if corr:
         datos["correlaciones"] = correlations_for_prompt(corr)
     return (

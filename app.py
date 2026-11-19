@@ -77,24 +77,38 @@ def render_correlations(corr: dict | None, fuente: str) -> None:
         f"Calma: {vc['inicio']} a {vc['fin']}. Estrés: {ve['inicio']} a {ve['fin']} ({ve['justificacion']}) "
         f"Datos: {fuente}. Cubre el {corr['peso_cubierto_pct']:.1f} % de la cartera."
     )
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Correlación media", f"{corr['estres']['correlacion_media']:.2f}",
-              f"{corr['estres']['correlacion_media'] - corr['calma']['correlacion_media']:+.2f} frente a calma",
-              delta_color="inverse")
-    c2.metric("Volatilidad anual de la cartera", f"{corr['estres']['volatilidad_cartera_pct']:.1f} %",
+    def fmt(v):
+        return "n/d" if v is None else f"{v:.2f}"
+
+    def delta(clave):
+        a, b = corr["calma"].get(clave), corr["estres"].get(clave)
+        return None if a is None or b is None else f"{b - a:+.2f} frente a calma"
+
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Correlación entre activos de riesgo", fmt(corr["estres"]["correlacion_media_entre_riesgo"]),
+              delta("correlacion_media_entre_riesgo"), delta_color="inverse",
+              help="Media de las correlaciones entre los activos de riesgo de la cartera. Si sube, convergen.")
+    c2.metric("Correlación riesgo-refugio", fmt(corr["estres"]["correlacion_media_riesgo_refugio"]),
+              delta("correlacion_media_riesgo_refugio"), delta_color="inverse",
+              help="Media de las correlaciones entre activos de riesgo y refugios (bonos core, oro). "
+                   "Si baja o es negativa, los refugios protegen.")
+    c3.metric("Volatilidad anual de la cartera", f"{corr['estres']['volatilidad_cartera_pct']:.1f} %",
               f"{corr['estres']['volatilidad_cartera_pct'] - corr['calma']['volatilidad_cartera_pct']:+.1f} pp frente a calma",
               delta_color="inverse")
-    c3.metric("Ratio de diversificación", f"{corr['estres']['ratio_diversificacion']:.2f}",
+    c4.metric("Ratio de diversificación", f"{corr['estres']['ratio_diversificacion']:.2f}",
               f"{corr['estres']['ratio_diversificacion'] - corr['calma']['ratio_diversificacion']:+.2f} frente a calma",
               help="Media ponderada de las volatilidades dividida entre la volatilidad de la cartera. "
                    "Cuanto más cerca de 1, menos beneficio aporta la diversificación.")
     h1, h2 = st.columns(2)
     h1.altair_chart(heatmap(corr["calma"]["matriz"], "Calma"), width="stretch")
     h2.altair_chart(heatmap(corr["estres"]["matriz"], "Estrés"), width="stretch")
-    st.markdown("**Pares que más cambian**")
+    st.markdown("**Pares con más impacto en el riesgo de la cartera**")
+    st.caption("Impacto: parte de la varianza de la cartera en estrés que se debe al cambio de correlación del par. "
+               "Positivo, el cambio aumenta el riesgo; negativo, lo reduce.")
     st.dataframe(
-        pd.DataFrame([{"Par": c["par"], "Calma": c["calma"], "Estrés": c["estres"], "Cambio": c["cambio"]}
-                      for c in corr["mayores_cambios"]]),
+        pd.DataFrame([{"Par": c["par"], "Tipo": c["tipo"], "Calma": c["calma"], "Estrés": c["estres"],
+                       "Cambio": c["cambio"], "Impacto (% varianza)": c["impacto_en_varianza_pct"]}
+                      for c in corr["pares_mas_relevantes"]]),
         hide_index=True, width="stretch",
     )
     notas = []
@@ -106,7 +120,13 @@ def render_correlations(corr: dict | None, fuente: str) -> None:
         st.caption("Excluidos del cálculo (" + "; ".join(notas) + "). La volatilidad se calcula sobre la parte cubierta.")
 
 
-def render_report(run: dict) -> None:
+def render_report(run: dict, scenario_key: str, portfolio: dict) -> None:
+    if run["escenario"] != scenario_key or run["cartera"] != portfolio:
+        st.info(
+            f"El último informe se generó para «{SCENARIOS[run['escenario']]['nombre']}» con otra cartera o escenario. "
+            "Pulsa «Generar informe» para analizar la selección actual."
+        )
+        return
     st.caption(
         f"Informe para «{SCENARIOS[run['escenario']]['nombre']}», "
         f"modelo {run['modelo']}, prompt {run['prompt_version']}, {run['timestamp']}"
@@ -292,7 +312,9 @@ if st.button("Generar informe", type="primary", disabled=not api_key):
         "escenario": scenario_key,
         "cartera": portfolio,
         "totales": impacts["totales"],
-        "correlacion_media": ({p: corr[p]["correlacion_media"] for p in ("calma", "estres")} if corr else None),
+        "correlaciones_medias": ({p: {k: corr[p][k] for k in ("correlacion_media", "correlacion_media_entre_riesgo",
+                                                         "correlacion_media_riesgo_refugio")}
+                                 for p in ("calma", "estres")} if corr else None),
         "n_incidencias": len(issues),
         "incidencias": issues,
         "informe": report,
@@ -304,7 +326,7 @@ if st.button("Generar informe", type="primary", disabled=not api_key):
     save_run(run)
 
 if st.session_state.last_run:
-    render_report(st.session_state.last_run)
+    render_report(st.session_state.last_run, scenario_key, portfolio)
 
 if st.session_state.runs:
     st.divider()

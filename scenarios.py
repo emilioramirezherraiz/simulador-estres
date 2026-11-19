@@ -34,6 +34,22 @@ ASSET_SHORT = {
     "bitcoin": "Bitcoin", "stablecoins": "Stablecoins", "liquidez": "Liquidez",
 }
 
+# Clasificación de activos (v1.3). Se pasa a la IA como dato para que no la
+# improvise. "funcion" indica su papel en una crisis; "naturaleza", qué tipo de activo es.
+ASSET_ROLE = {
+    "rv_desarrollada": "riesgo", "rv_emergente": "riesgo", "high_yield": "riesgo",
+    "inmobiliario": "riesgo", "petroleo": "riesgo", "bitcoin": "riesgo",
+    "bonos_core": "refugio", "oro": "refugio",
+    "stablecoins": "liquidez", "liquidez": "liquidez",
+}
+ASSET_NATURE = {
+    "rv_desarrollada": "activo financiero", "rv_emergente": "activo financiero",
+    "bonos_core": "activo financiero", "high_yield": "activo financiero",
+    "inmobiliario": "activo real", "oro": "activo real", "petroleo": "activo real (materia prima)",
+    "bitcoin": "criptoactivo (no es un activo real)", "stablecoins": "criptoactivo (no es un activo real)",
+    "liquidez": "efectivo",
+}
+
 # Periodo de referencia "en calma" con el que se comparan las ventanas de estrés (v1.2).
 CALM_WINDOW = {
     "inicio": "2017-01-01", "fin": "2019-12-31",

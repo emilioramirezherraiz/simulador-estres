@@ -56,6 +56,7 @@ def _allowed_numbers(portfolio: dict, scenario_key: str, impacts: dict, corr: di
         for periodo in ("calma", "estres"):
             allowed.add(abs(float(corr[periodo]["volatilidad_cartera_pct"])))
             allowed.update(abs(float(v)) for v in corr[periodo]["volatilidades_pct"].values())
+        allowed.update(abs(float(c["impacto_en_varianza_pct"])) for c in corr["pares_mas_relevantes"])
     return allowed
 
 
@@ -65,8 +66,10 @@ def _allowed_correlations(corr: dict | None) -> set[float]:
     values = set()
     for periodo in ("calma", "estres"):
         values.update(abs(float(v)) for v in corr[periodo]["matriz"].to_numpy().ravel())
-        values.add(abs(float(corr[periodo]["correlacion_media"])))
-    values.update(abs(float(c["cambio"])) for c in corr["mayores_cambios"])
+        for clave in ("correlacion_media", "correlacion_media_entre_riesgo", "correlacion_media_riesgo_refugio"):
+            if corr[periodo].get(clave) is not None:
+                values.add(abs(float(corr[periodo][clave])))
+    values.update(abs(float(c["cambio"])) for c in corr["pares_mas_relevantes"])
     return values
 
 
@@ -134,6 +137,18 @@ def validate_report(report: dict, portfolio: dict, scenario_key: str, impacts: d
                         "tipo": "correlacion_no_respaldada",
                         "detalle": f"Aparece la correlación '{match.group(0)}', que no está en los datos.",
                     })
+
+    # 3c. Omisiones relevantes (v1.3): los tres pares con más impacto en el riesgo
+    # de la cartera deben aparecer en "diversificacion" (se busca su correlación en estrés).
+    if corr:
+        texto = str(report.get("diversificacion", ""))
+        for par in corr["pares_mas_relevantes"][:3]:
+            v = f"{abs(par['estres']):.2f}"
+            if v not in texto and v.replace(".", ",") not in texto:
+                issues.append({
+                    "tipo": "omision_relevante",
+                    "detalle": f"'diversificacion' no comenta el par {par['par']}, uno de los tres con más impacto en el riesgo de la cartera ({par['impacto_en_varianza_pct']} % de la varianza).",
+                })
 
     # 4. Confianza
     if str(report.get("confianza", "")).lower() not in {"alta", "media", "baja"}:
