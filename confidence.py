@@ -15,6 +15,9 @@ def assess_confidence(impacts: dict, corr: dict | None) -> dict:
         "Los shocks se calibran con una única ventana histórica, que puede no repetirse en otra crisis.",
         "Cada clase de activo se representa con un fondo cotizado, no con la cartera real del inversor.",
     ]
+    activos = {f["activo"] for f in impacts["filas"]}
+    if "rv_desarrollada" in activos:
+        motivos.append("La renta variable desarrollada se representa solo con el S&P 500 (EE. UU.).")
     nivel = "media"  # nunca "alta": haría falta contrastar con varias ventanas históricas
 
     peso_supuestos = sum(f["peso"] for f in impacts["filas"] if f.get("origen") == "supuesto")

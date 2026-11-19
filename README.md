@@ -48,6 +48,6 @@ streamlit run app.py
 ## Flujo de trabajo para la bitácora
 
 1. Cada vez que cambies el prompt, sube `PROMPT_VERSION` en `prompts.py`.
-2. Ejecuta `python evaluate.py` (antes, en PowerShell: `$env:GEMINI_API_KEY="tu_clave"`) y guarda el CSV de `logs/`.
+2. Lanza la evaluación en lote en GitHub con `gh workflow run evaluate.yml` (la primera vez, guarda la clave con `gh secret set GEMINI_API_KEY`) y trae los resultados con `git pull`; quedan en `resultados/`.
 3. Revisa a mano los informes, además de las incidencias automáticas: el validador no detecta un razonamiento absurdo con la dirección correcta.
 4. Anota en la bitácora: qué falló, cómo lo detectaste, qué cambiaste y si el número de incidencias bajó.

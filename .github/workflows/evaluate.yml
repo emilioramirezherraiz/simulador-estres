@@ -1,0 +1,32 @@
+name: Evaluar informes
+
+# Ejecuta evaluate.py en los servidores de GitHub (3 carteras x 3 escenarios)
+# y guarda los resultados en la carpeta resultados/ del repositorio.
+# Necesita el secreto GEMINI_API_KEY (gh secret set GEMINI_API_KEY).
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install google-genai pandas numpy
+      - run: python evaluate.py
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+      - name: Guardar los resultados en el repositorio
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add resultados/
+          git commit -m "Resultados de la evaluación en lote" || echo "Sin cambios"
+          git push

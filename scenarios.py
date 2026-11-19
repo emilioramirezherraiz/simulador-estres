@@ -13,7 +13,7 @@ hasta el final de la fase: la fase 2 incluye la fase 1, no se suma a ella.
 ASSET_CLASSES = {
     "rv_desarrollada": "Renta variable desarrollada",
     "rv_emergente": "Renta variable emergente",
-    "bonos_core": "Bonos soberanos core (EE. UU., Alemania)",
+    "bonos_core": "Bonos soberanos core (Tesoro de EE. UU.)",
     "high_yield": "Bonos corporativos high yield",
     "inmobiliario": "Inmobiliario cotizado (REITs/SOCIMIs)",
     "oro": "Oro",
