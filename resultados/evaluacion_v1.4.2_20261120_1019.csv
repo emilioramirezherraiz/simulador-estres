@@ -1,0 +1,535 @@
+prompt_version,modelo,cartera,escenario,intentos,n_incidencias,tipos,incidencias,respuesta_bruta
+v1.4.2,gemini-3.5-flash-lite,equilibrada,stablecoins,1,1,"{""direccion_contradictoria"": 1}","[{""tipo"": ""direccion_contradictoria"", ""detalle"": ""'bonos_core' en fase_2: el informe dice 'sube' y los datos indican 'estable' (0.5 %).""}]","{
+  ""resumen_ejecutivo"": ""El escenario de colapso sistémico de stablecoins genera un impacto negativo acumulado en la cartera del -6.77% al final de la fase 2, profundizando la caída inicial del -4.04% registrada en la fase 1. El canal de transmisión principal opera a través del desapalancamiento forzado y la pérdida de confianza que se extiende a los activos de riesgo. Los refugios tradicionales de la cartera no logran cumplir su función en este entorno de estrés extremo, mientras que la correlación entre los activos de riesgo aumenta de manera significativa."",
+  ""cadena_de_contagio"": [
+    {
+      ""fase"": ""fase_1"",
+      ""titulo"": ""Impacto inmediato y pérdida de paridad"",
+      ""descripcion"": ""Durante la fase 1, el canal de transmisión de reembolsos masivos obliga a vender reservas compuestas por letras del Tesoro y otros activos, coincidiendo con el hito en el que UST pierde la paridad y Terra colapsa. Esto provoca una caída inmediata en la renta variable desarrollada (-5.3%) y en la renta variable emergente (-6.9%), así como un desplome severo en bitcoin (-24.6%), mientras que los bonos soberanos core registran un comportamiento positivo con una subida del 1.2%.""
+    },
+    {
+      ""fase"": ""fase_2"",
+      ""titulo"": ""Contagio sistémico y reajuste"",
+      ""descripcion"": ""En la fase 2, el contagio se extiende a prestamistas cripto hasta alcanzar el mínimo de bitcoin, operando los canales de desapalancamiento forzado en exchanges y protocolos DeFi junto con la pérdida de confianza que se extiende a inversores comunes. La cartera profundiza su caída global, destacando el fuerte retroceso acumulado de bitcoin hasta el -48.7% y el empeoramiento de la renta variable desarrollada hasta el -8.6%, mientras los bonos soberanos core moderan su ganancia acumulada al 0.5%.""
+    }
+  ],
+  ""impacto_por_activo"": [
+    {
+      ""activo"": ""rv_desarrollada"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""La pérdida de confianza se extiende a los activos de riesgo con inversores comunes, provocando caídas que se profundizan debido al contagio generalizado.""
+    },
+    {
+      ""activo"": ""rv_emergente"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""El castigo inicial por la aversión global al riesgo se atenúa ligeramente en la fase 2 gracias a una recuperación parcial del activo dentro del contexto de tensiones.""
+    },
+    {
+      ""activo"": ""bonos_core"",
+      ""direccion_fase_1"": ""sube"",
+      ""direccion_fase_2"": ""sube"",
+      ""mecanismo"": ""Las ventas de reservas por reembolsos masivos generan presiones, aunque el activo mantiene un saldo positivo acumulado derivado de flujos iniciales hacia deuda pública.""
+    },
+    {
+      ""activo"": ""high_yield"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""La ampliación de diferenciales de crédito y la aversión al riesgo de impago penalizan fuertemente al segmento en la fase 2.""
+    },
+    {
+      ""activo"": ""oro"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""El activo real experimenta presiones bajistas ante la necesidad generalizada de liquidez y liquidación de posiciones en los mercados financieros.""
+    },
+    {
+      ""activo"": ""bitcoin"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""Sufre el impacto directo de los reembolsos masivos, el desapalancamiento forzado en exchanges y protocolos DeFi, y la quiebra de la paridad.""
+    },
+    {
+      ""activo"": ""liquidez"",
+      ""direccion_fase_1"": ""estable"",
+      ""direccion_fase_2"": ""estable"",
+      ""mecanismo"": ""Mantiene un valor constante por definición al tratarse de efectivo, sin exposición a los shocks del mercado.""
+    }
+  ],
+  ""diversificacion"": ""En cuanto a los refugios, ninguno de los dos analizados cumple su función en la ventana de estrés: los Bonos soberanos core registran una correlación media con el riesgo de 0.17 y el Oro de 0.24, superando ambos el umbral crítico de 0.10 y aumentando respecto a la calma. Respecto a los activos de riesgo, la correlación media entre riesgo experimenta una fuerte convergencia al subir de 0.36 en calma a 0.71 en estrés. Analizando los pares más relevantes ordenados por su impacto en la varianza, el par Renta variable desarrollada / Bitcoin pasa de una correlación de 0.02 a 0.62 debido al contagio del desapalancamiento cripto hacia los mercados tradicionales; el par Renta variable desarrollada / Bonos core pasa de -0.40 a 0.09, rompiendo la diversificación tradicional por la presión simultánea en tipos y renta variable; y el par Renta variable emergente / Bitcoin sube de 0.02 a 0.68, reflejando una alta sincronización de los activos especulativos durante la crisis."",
+  ""riesgos_de_concentracion"": ""La cartera presenta una elevada concentración en renta variable, que agrupa el 50% del peso total y genera la mayor parte de las contribuciones negativas tanto en la fase 1 (-2.81 pp) como en la fase 2 (-3.88 pp). Asimismo, la exposición conjunta a activos de riesgo y criptoactivos amplifica la vulnerabilidad ante eventos de desapalancamiento sistémico."",
+  ""supuestos"": [
+    ""Los shocks de los activos se calibran utilizando fondos cotizados representativos de cada clase (SPY, EEM, IEF, HYG, VNQ, GLD, USO, BTC-USD)."",
+    ""Se asume que el comportamiento histórico observado durante el colapso de Terra/UST en mayo-junio de 2022 es representativo de un colapso sistémico de stablecoins.""
+  ],
+  ""limitaciones"": [
+    ""Los shocks se calibran con una única ventana histórica, que puede no repetirse de la misma forma en otra crisis."",
+    ""Cada clase de activo se representa con un fondo cotizado y no con la cartera real y específica del inversor."",
+    ""La renta variable desarrollada está representada únicamente por el índice S&P 500 de Estados Unidos.""
+  ],
+  ""confianza"": ""media"",
+  ""justificacion_confianza"": ""Los shocks se calibran con una única ventana histórica, que puede no repetirse en otra crisis. Cada clase de activo se representa con un fondo cotizado, no con la cartera real del inversor. La renta variable desarrollada se representa solo con el S&P 500 (EE. UU.).""
+}"
+v1.4.2,gemini-3.5-flash-lite,equilibrada,energia,2,1,"{""direccion_contradictoria"": 1}","[{""tipo"": ""direccion_contradictoria"", ""detalle"": ""'bonos_core' en fase_1: el informe dice 'sube' y los datos indican 'estable' (0.9 %).""}]","{
+  ""resumen_ejecutivo"": ""El escenario de shock energético global genera un impacto moderado en la fase 1 de -0.84% y una fuerte profundización en la fase 2 hasta alcanzar una caída acumulada en la cartera de -13.75%. La subida de costes de producción y la presión inflacionista obligan a los bancos centrales a endurecer la política monetaria, afectando tanto a los activos de riesgo como a los refugios tradicionales. La correlación media de la cartera aumenta de 0.12 a 0.40, reduciendo la diversificación y provocando caídas generalizadas en casi todas las clases de activo."",
+  ""cadena_de_contagio"": [
+    {
+      ""fase"": ""fase_1"",
+      ""titulo"": ""Shock inmediato por la crisis energética"",
+      ""descripcion"": ""Entre el 2022-02-24 y el 2022-03-08, impulsado por el canal de transmisión de subida de costes de producción y caída de márgenes empresariales, se produce el máximo del petróleo tras la invasión. En esta primera fase, los activos de riesgo sufren presiones moderadas, mientras que algunos refugios como el oro registran ganancias iniciales ante la búsqueda de protección contra la inflación.""
+    },
+    {
+      ""fase"": ""fase_2"",
+      ""titulo"": ""Endurecimiento monetario y caída conjunta de mercados"",
+      ""descripcion"": ""Desde el 2022-03-08 hasta el 2022-10-31, operan los canales de repunte de la inflación y subida de tipos de interés, así como la caída de la renta disponible y del consumo. Se materializan subidas de tipos y la caída conjunta de bolsa y bonos hasta octubre de 2022, lo que profundiza de forma generalizada las caídas en la renta variable, bonos soberanos y activos reales.""
+    }
+  ],
+  ""impacto_por_activo"": [
+    {
+      ""activo"": ""rv_desarrollada"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""La subida de costes de producción y caída de márgenes empresariales, junto con la subida de tipos de interés, castigan las valoraciones bursátiles en la fase 1 y profundizan la caída en la fase 2.""
+    },
+    {
+      ""activo"": ""rv_emergente"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""El deterioro de las balanzas de los países importadores de energía y el endurecimiento monetario global penalizan con mayor intensidad a estos mercados desde el inicio y a lo largo de la fase 2.""
+    },
+    {
+      ""activo"": ""bonos_core"",
+      ""direccion_fase_1"": ""sube"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""En la fase 1 actúan como refugio inicial ante la incertidumbre geopolítica, pero en la fase 2 la subida de tipos de interés y el repunte de la inflación provocan una fuerte caída acumulada.""
+    },
+    {
+      ""activo"": ""high_yield"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""La ampliación de diferenciales de crédito y el deterioro de la renta disponible y del consumo afectan negativamente a la solvencia corporativa en ambas fases.""
+    },
+    {
+      ""activo"": ""oro"",
+      ""direccion_fase_1"": ""sube"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""Como activo real, sube en la fase 1 al capturar flujos contra la inflación, pero en la fase 2 cede debido a la agresiva subida de tipos reales y del coste de oportunidad.""
+    },
+    {
+      ""activo"": ""bitcoin"",
+      ""direccion_fase_1"": ""sube"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""Muestra una subida inicial especulativa en la fase 1, pero en la fase 2 se desploma fuertemente al verse arrastrado por la retirada de liquidez y la contracción monetaria.""
+    },
+    {
+      ""activo"": ""liquidez"",
+      ""direccion_fase_1"": ""estable"",
+      ""direccion_fase_2"": ""estable"",
+      ""mecanismo"": ""Por definición, el efectivo no sufre variación en ninguna de las dos fases del escenario.""
+    }
+  ],
+  ""diversificacion"": ""En cuanto a los refugios de la cartera en la ventana de estrés, los bonos soberanos core (Tesoro de EE. UU.) registran una correlación media con el riesgo de 0.20 y no cumplen su función de refugio. El oro registra una correlación media con el riesgo de 0.20 y tampoco cumple su función de refugio, ya que ambos superan el umbral de 0.10. Por otro lado, los activos de riesgo convergieron de manera significativa, situándose la correlación media entre riesgo en 0.65 durante el estrés. Respecto a los pares más relevantes, en primer lugar, el par Renta variable desarrollada / Bitcoin (riesgo / riesgo), con un cambio de correlación de 0.54 (de 0.02 a 0.56), aumenta fuertemente la varianza de la cartera debido a la pérdida de descorrelación y el desplome simultáneo del criptoactivo. En segundo lugar, el par Renta variable desarrollada / Bonos core (riesgo / refugio), con un cambio de correlación de 0.55 (de -0.40 a 0.15), encarece el riesgo de la cartera porque los bonos dejan de actuar como contrapeso y se mueven en la misma dirección que las acciones por el impacto de los tipos. En tercer lugar, el par Renta variable desarrollada / Oro (riesgo / refugio), con un cambio de correlación de 0.29 (de -0.15 a 0.14), incrementa la varianza al reducirse la capacidad de cobertura del oro frente a las caídas bursátiles."",
+  ""riesgos_de_concentracion"": ""La cartera presenta una elevada concentración en renta variable (50% del peso total), la cual experimenta caídas severas tanto en su vertiente desarrollada como emergente. Asimismo, la renta fija core, que representa un 25% de la cartera, deja de actuar como cobertura eficaz en un contexto inflacionista, correlacionándose de manera adversa con el componente de riesgo y acumulando pérdidas abultadas en la fase 2."",
+  ""supuestos"": [
+    ""Los shocks de los activos se calibran utilizando fondos cotizados representativos para cada clase de activo."",
+    ""La liquidez se mantiene estable por definición al carecer de variación de precio en las series temporales utilizadas.""
+  ],
+  ""limitaciones"": [
+    ""Los shocks se calibran con una única ventana histórica, que puede no repetirse en otra crisis."",
+    ""Cada clase de activo se representa con un fondo cotizado, no con la cartera real del inversor."",
+    ""La renta variable desarrollada se representa solo con el S&P 500 (EE. UU.).""
+  ],
+  ""confianza"": ""media"",
+  ""justificacion_confianza"": ""Los shocks se calibran con una única ventana histórica, que puede no repetirse en otra crisis. Cada clase de activo se representa con un fondo cotizado, no con la cartera real del inversor. La renta variable desarrollada se representa solo con el S&P 500 (EE. UU.).""
+}"
+v1.4.2,gemini-3.5-flash-lite,equilibrada,panico_liquidez,1,0,{},[],"{
+  ""resumen_ejecutivo"": ""El escenario de pánico global de liquidez provoca una fuerte contracción en la cartera, impulsada por una huida generalizada hacia el efectivo que afecta severamente a los activos de riesgo. En la primera fase, el impacto inmediato genera una caída severa acumulada, mientras que los activos refugio tradicionales actúan de manera dispar frente a las llamadas de margen. Durante la segunda fase, la intervención de los bancos centrales modera las pérdidas y permite una recuperación parcial de los precios. El riesgo de la cartera aumenta considerablemente debido a la convergencia en el comportamiento de los activos de riesgo."",
+  ""cadena_de_contagio"": [
+    {
+      ""fase"": ""fase_1"",
+      ""titulo"": ""Impacto Inmediato y Colapso de Liquidez"",
+      ""descripcion"": ""Entre el 2020-02-19 y el 2020-03-23, se desata una caída brusca de la demanda esperada y llamadas de margen que obligan a los inversores a vender todo tipo de activos para obtener efectivo, provocando una ampliación de diferenciales de crédito y un cierre del mercado de financiación que culmina en el mínimo de la bolsa y el anuncio de compras ilimitadas de la Reserva Federal.""
+    },
+    {
+      ""fase"": ""fase_2"",
+      ""titulo"": ""Reajuste e Intervención de Bancos Centrales"",
+      ""descripcion"": ""Entre el 2020-03-23 y el 2020-04-30, la intervención posterior de bancos centrales y gobiernos frena el pánico y estabiliza los mercados, permitiendo una recuperación de los precios en la mayoría de los activos de la cartera hasta la estabilización tras la intervención.""
+    }
+  ],
+  ""impacto_por_activo"": [
+    {
+      ""activo"": ""rv_desarrollada"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""La caída brusca de la demanda esperada y las llamadas de margen obligan a deshacer posiciones en renta variable para cubrir necesidades de liquidez inmediata.""
+    },
+    {
+      ""activo"": ""rv_emergente"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""La salida masiva de capitales de economías en desarrollo, impulsada por la búsqueda de efectivo, presiona a la baja a los activos emergentes.""
+    },
+    {
+      ""activo"": ""bonos_core"",
+      ""direccion_fase_1"": ""sube"",
+      ""direccion_fase_2"": ""sube"",
+      ""mecanismo"": ""Actúan como refugio seguro, beneficiándose de la huida hacia activos de máxima calidad crediticia gubernamental a pesar de las presiones iniciales de liquidez.""
+    },
+    {
+      ""activo"": ""high_yield"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""La ampliación de diferenciales de crédito y el cierre del mercado de financiación castigan severamente a los bonos corporativos de menor calidad.""
+    },
+    {
+      ""activo"": ""oro"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""sube"",
+      ""mecanismo"": ""En la primera fase sufre ventas forzadas por llamadas de margen para obtener liquidez, pero posteriormente recupera su atractivo como activo real ante la inyección monetaria.""
+    },
+    {
+      ""activo"": ""bitcoin"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""Al comportarse como un activo de riesgo y sufrir de alta illiquidez, es liquidado agresivamente por inversores en busca de efectivo.""
+    },
+    {
+      ""activo"": ""liquidez"",
+      ""direccion_fase_1"": ""estable"",
+      ""direccion_fase_2"": ""estable"",
+      ""mecanismo"": ""Mantiene su valor nominal invariable por definición al actuar como efectivo o activo monetario.""
+    }
+  ],
+  ""diversificacion"": ""En cuanto a los refugios de la cartera, los Bonos soberanos core (Tesoro de EE. UU.) cumplieron su función de refugio con una correlación media con el riesgo de -0.38 en estrés, mientras que el Oro no cumplió su función al elevar su correlación media con el riesgo a 0.26. Los activos de riesgo convergieron de forma notable, elevando la correlación media entre riesgo a 0.69. Respecto a los pares más relevantes, en primer lugar, Renta variable desarrollada y Bitcoin pasaron de una correlación de 0.02 a 0.58 debido a la liquidación conjunta impulsada por necesidades de liquidez, aportando un impacto en varianza del 13.7%. En segundo lugar, Renta variable desarrollada y Renta variable emergente aumentaron de 0.74 a 0.93 por la huida generalizada de los mercados bursátiles, generando un impacto en varianza del 4.6%. En tercer lugar, Renta variable desarrollada y Oro pasaron de -0.15 a 0.22 porque el oro sufrió ventas forzadas iniciales similares a las de la renta variable, con un impacto en varianza del 4.1%."",
+  ""riesgos_de_concentracion"": ""La cartera presenta una alta concentración en activos de riesgo, con un peso agregado del 50% en renta variable que genera la mayor parte de las pérdidas negativas durante ambas fases. Asimismo, la inclusión de criptoactivos y renta variable emergente incrementa la vulnerabilidad ante episodios de contracción severa de la liquidez global."",
+  ""supuestos"": [
+    ""Los shocks de los activos se calibran utilizando fondos cotizados representativos durante el crash por la COVID-19 de marzo de 2020.""
+  ],
+  ""limitaciones"": [
+    ""Los resultados se basan en una única ventana histórica de estrés, lo que puede limitar la capacidad de anticipar dinámicas en futuras crisis con diferentes detonantes."",
+    ""El uso de fondos cotizados como representación de las clases de activo puede diferir de la estructura real de la cartera del inversor.""
+  ],
+  ""confianza"": ""media"",
+  ""justificacion_confianza"": ""Los shocks se calibran con una única ventana histórica, que puede no repetirse en otra crisis. Cada clase de activo se representa con un fondo cotizado, no con la cartera real del inversor. La renta variable desarrollada se representa solo con el S&P 500 (EE. UU.).""
+}"
+v1.4.2,gemini-3.5-flash-lite,cripto_agresiva,stablecoins,1,1,"{""claves_internas_en_texto"": 1}","[{""tipo"": ""claves_internas_en_texto"", ""detalle"": ""El texto usa claves internas en lugar de nombres legibles: correlacion_media_entre_riesgo.""}]","{
+  ""resumen_ejecutivo"": ""La cartera experimenta un impacto severo ante un colapso sistémico de stablecoins, arrastrada por la fuerte exposición al segmento cripto y la renta variable desarrollada. En la fase 1, el shock inmediato provoca una caída de la cartera del -14.97%, impulsada por el pánico inicial y UST pierde la paridad y Terra colapsa. En la fase 2, el contagio a prestamistas cripto y mínimo de bitcoin profundiza la caída hasta un acumulado del -26.19%. La diversificación se deteriora notablemente debido a la convergencia de los activos de riesgo durante el episodio de tensión."",
+  ""cadena_de_contagio"": [
+    {
+      ""fase"": ""fase_1"",
+      ""titulo"": ""Impacto inmediato y pérdida de paridad"",
+      ""descripcion"": ""Entre el 2022-05-01 y el 2022-05-12, los reembolsos masivos que obligan a vender reservas y la pérdida de confianza que se extiende a activos de riesgo con inversores comunes desencadenan una venta generalizada. El hito al final de la fase marca cuando UST pierde la paridad y Terra colapsa.""
+    },
+    {
+      ""fase"": ""fase_2"",
+      ""titulo"": ""Reajuste y contagio sistémico"",
+      ""descripcion"": ""Entre el 2022-05-12 y el 2022-06-30, el desapalancamiento forzado en exchanges y protocolos DeFi amplifica las tensiones, profundizando las caídas acumuladas. El hito al final de la fase viene determinado por el contagio a prestamistas cripto y mínimo de bitcoin.""
+    }
+  ],
+  ""impacto_por_activo"": [
+    {
+      ""activo"": ""rv_desarrollada"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""La pérdida de confianza que se extiende a activos de riesgo con inversores comunes presiona a la baja a la renta variable desarrollada.""
+    },
+    {
+      ""activo"": ""bitcoin"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""El desapalancamiento forzado en exchanges y protocolos DeFi golpea con dureza a bitcoin, profundizando sus pérdidas.""
+    },
+    {
+      ""activo"": ""stablecoins"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""Los reembolsos masivos que obligan a vender reservas provocan una pérdida de valor estimada para la cesta de stablecoins.""
+    },
+    {
+      ""activo"": ""liquidez"",
+      ""direccion_fase_1"": ""estable"",
+      ""direccion_fase_2"": ""estable"",
+      ""mecanismo"": ""La liquidez y los activos monetarios permanecen estables por definición al no verse afectados directamente por los shocks de mercado.""
+    }
+  ],
+  ""diversificacion"": ""No hay refugios en la cartera que cumplan con el criterio de refugio establecido. Los activos de riesgo convergieron de forma significativa, tal como refleja la correlacion_media_entre_riesgo, que pasa de 0.02 en calma a 0.62 en estrés. El par más relevante es Renta variable desarrollada y Bitcoin, cuyo paso de 0.02 a 0.62 incrementa la varianza de la cartera debido a la alta sincronización de las caídas durante el estrés del mercado cripto."",
+  ""riesgos_de_concentracion"": ""La cartera presenta una fuerte concentración en el bloque cripto, que abarca un peso del 60.0% y acumula una contribución negativa muy elevada tanto en la fase 1 (-13.38 pp) como en la fase 2 (-23.61 pp), amplificando la vulnerabilidad global ante eventos de tensión en este sector."",
+  ""supuestos"": [
+    ""Stablecoins se modeliza mediante un supuesto de pérdida de valor para una cesta en un colapso más amplio que el de Terra/UST, manteniendo el resto la paridad.""
+  ],
+  ""limitaciones"": [
+    ""Los shocks se calibran con una única ventana histórica basada en el colapso de Terra/UST, que puede no repetirse en otra crisis."",
+    ""Cada clase de activo se representa con un fondo cotizado, no con la cartera real del inversor."",
+    ""La renta variable desarrollada se representa únicamente con el S&P 500 de EE. UU."",
+    ""El 30.0% de la cartera se basa en supuestos y no en datos de mercado observables.""
+  ],
+  ""confianza"": ""baja"",
+  ""justificacion_confianza"": ""Los shocks se calibran con una única ventana histórica, que puede no repetirse en otra crisis. Cada clase de activo se representa con un fondo cotizado, no con la cartera real del inversor. La renta variable desarrollada se representa solo con el S&P 500 (EE. UU.). El 30.0 % de la cartera se basa en supuestos, no en datos de mercado.""
+}"
+v1.4.2,gemini-3.5-flash-lite,cripto_agresiva,energia,1,1,"{""correlacion_no_respaldada"": 1}","[{""tipo"": ""correlacion_no_respaldada"", ""detalle"": ""Aparece la correlación '-0.51', que no está en los datos.""}]","{
+  ""resumen_ejecutivo"": ""En el escenario de shock energético global, la cartera experimenta un impacto limitado en la fase 1 de -0.51 %, seguido de una caída severa en la fase 2 hasta alcanzar un impacto total de -16.59 %. La fase 1 abarca del 2022-02-24 al 2022-03-08 y concluye con el máximo del petróleo tras la invasión, mientras que la fase 2 se extiende hasta el 2022-10-31 bajo el hito de subidas de tipos y caída conjunta de bolsa y bonos. La mayor presión sobre la cartera proviene del segmento de criptoactivos, concentrando la caída principal en la segunda etapa."",
+  ""cadena_de_contagio"": [
+    {
+      ""fase"": ""fase_1"",
+      ""titulo"": ""Impacto inmediato y shock energético"",
+      ""descripcion"": ""Entre el 2022-02-24 y el 2022-03-08, hito marcado por el máximo del petróleo tras la invasión, los canales de transmisión de subida de costes de producción y caída de márgenes empresariales y de deterioro de las balanzas de los países importadores de energía generan una contracción moderada en la renta variable desarrollada, mientras que el bitcoin muestra un comportamiento ligeramente positivo antes de la generalización de las tensiones.""
+    },
+    {
+      ""fase"": ""fase_2"",
+      ""titulo"": ""Reajuste monetario y caídas generalizadas"",
+      ""descripcion"": ""Desde el 2022-03-08 hasta el 2022-10-31, bajo el hito de subidas de tipos y caída conjunta de bolsa y bonos, operan con intensidad los canales de repunte de la inflación y subida de tipos de interés y de caída de la renta disponible y del consumo. Esto provoca que la renta variable desarrollada caiga más y que el bitcoin sufra un desplome severo, profundizando la caída total de la cartera hasta un -16.59 %.""
+    }
+  ],
+  ""impacto_por_activo"": [
+    {
+      ""activo"": ""rv_desarrollada"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""La subida de costes de producción y caída de márgenes empresariales impacta a la renta variable desarrollada en la fase 1, y la posterior subida de tipos de interés acelera su caída en la fase 2.""
+    },
+    {
+      ""activo"": ""bitcoin"",
+      ""direccion_fase_1"": ""sube"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""El bitcoin rebota ligeramente en la fase 1, pero la caída de la renta disponible y del consumo y la subida de tipos de interés provocan que caiga más en la fase 2.""
+    },
+    {
+      ""activo"": ""stablecoins"",
+      ""direccion_fase_1"": ""estable"",
+      ""direccion_fase_2"": ""estable"",
+      ""mecanismo"": ""Bajo el supuesto de mantenimiento de la paridad en una cesta de stablecoins, el activo se mantiene estable en ambas fases sin registrar variaciones.""
+    },
+    {
+      ""activo"": ""liquidez"",
+      ""direccion_fase_1"": ""estable"",
+      ""direccion_fase_2"": ""estable"",
+      ""mecanismo"": ""Por definición, la liquidez / monetario no presenta variación en ninguna de las dos fases del escenario.""
+    }
+  ],
+  ""diversificacion"": ""No hay refugios en la cartera que cumplan con el criterio de refugio establecido para la ventana de estrés. Respecto a la convergencia de los activos de riesgo, la correlación media entre riesgo pasa de 0.02 en calma a 0.56 en estrés. En cuanto a los pares más relevantes, el par Renta variable desarrollada / Bitcoin pasa de una correlación de 0.02 en calma a 0.56 en estrés, con un cambio de 0.54 y un impacto en la varianza del 25.9 %, reflejando una pérdida de diversificación al moverse ambos activos de forma conjunta a la baja durante la crisis."",
+  ""riesgos_de_concentracion"": ""Existe una alta concentración en el grupo de criptoactivos, que abarca el 60.0 % de la cartera entre bitcoin y stablecoins, aportando una contribución fuertemente negativa de -13.95 puntos porcentuales en la fase 2 a través del bitcoin."",
+  ""supuestos"": [
+    ""El precio de las stablecoins está anclado a 1 dólar y se asume que mantienen la paridad, salvo en un colapso más amplio donde la cesta asume una pérdida bajo supuesto."",
+    ""La liquidez y monetario se mantienen sin variación por definición en todo el horizonte temporal del escenario.""
+  ],
+  ""limitaciones"": [
+    ""Los shocks se calibran con una única ventana histórica, que puede no repetirse en otra crisis."",
+    ""Cada clase de activo se representa con un fondo cotizado, no con la cartera real del inversor."",
+    ""La renta variable desarrollada se representa solo con el S&P 500 (EE. UU.)."",
+    ""El 30.0 % de la cartera se basa en supuestos, no en datos de mercado.""
+  ],
+  ""confianza"": ""baja"",
+  ""justificacion_confianza"": ""Los shocks se calibran con una única ventana histórica, que puede no repetirse en otra crisis. Cada clase de activo se representa con un fondo cotizado, no con la cartera real del inversor. La renta variable desarrollada se representa solo con el S&P 500 (EE. UU.). El 30.0 % de la cartera se basa en supuestos, no en datos de mercado.""
+}"
+v1.4.2,gemini-3.5-flash-lite,cripto_agresiva,panico_liquidez,1,1,"{""correlacion_no_respaldada"": 1}","[{""tipo"": ""correlacion_no_respaldada"", ""detalle"": ""Aparece la correlación '0.10', que no está en los datos.""}]","{
+  ""resumen_ejecutivo"": ""El escenario de pánico global de liquidez provoca una severa contracción inicial en la cartera, con un impacto total en la fase 1 del -20.43 por ciento. Durante la fase 2, la cartera experimenta una recuperación parcial impulsada por la intervención posterior de bancos centrales y gobiernos, situándose el impacto acumulado en el -7.11 por ciento. Los activos de riesgo sufren caídas acusadas debido a las llamadas de margen que obligan a vender lo que tiene liquidez. La diversificación se deteriora notablemente al dispararse la correlación entre los componentes de riesgo."",
+  ""cadena_de_contagio"": [
+    {
+      ""fase"": ""fase_1"",
+      ""titulo"": ""Impacto inmediato y desplome de liquidez"",
+      ""descripcion"": ""Entre el 2020-02-19 y el 2020-03-23, un evento inesperado genera una huida generalizada hacia el efectivo desencadenada por llamadas de margen que obligan a vender lo que tiene liquidez y una caída brusca de la demanda esperada, alcanzando un hito al final de la fase consistente en el mínimo de la bolsa y el anuncio de compras ilimitadas de la Reserva Federal.""
+    },
+    {
+      ""fase"": ""fase_2"",
+      ""titulo"": ""Reajuste y estabilización por intervención"",
+      ""descripcion"": ""Desde el 2020-03-23 hasta el 2020-04-30, tras la intervención posterior de bancos centrales y gobiernos, la cartera recupera parte del terreno perdido, culminando con la estabilización tras la intervención.""
+    }
+  ],
+  ""impacto_por_activo"": [
+    {
+      ""activo"": ""rv_desarrollada"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""La caída brusca de la demanda esperada y las llamadas de margen que obligan a vender lo que tiene liquidez provocan un desplome inicial, seguido de una recuperación parcial en la fase 2.""
+    },
+    {
+      ""activo"": ""bitcoin"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""Las llamadas de margen que obligan a vender lo que tiene liquidez, incluidos algunos activos considerados refugio, afectan fuertemente a este activo de riesgo en la fase 1, con un repunte posterior en la fase 2.""
+    },
+    {
+      ""activo"": ""stablecoins"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""estable"",
+      ""mecanismo"": ""Bajo el supuesto de una pérdida en una cesta de stablecoins en un colapso más amplio, registra una leve contracción en la fase 1 y se mantiene estable en la fase 2.""
+    },
+    {
+      ""activo"": ""liquidez"",
+      ""direccion_fase_1"": ""estable"",
+      ""direccion_fase_2"": ""estable"",
+      ""mecanismo"": ""Por definición, este componente de efectivo no registra variación durante las fases del escenario.""
+    }
+  ],
+  ""diversificacion"": ""No hay refugios en la cartera que cumplan con la condición de no subir y quedar por debajo de 0.10 en estrés, por lo que ningún refugio cumple su función. Los activos de riesgo convergieron, con una correlación media entre riesgo que pasa de 0.02 en calma a 0.58 en estrés. En cuanto a los pares más relevantes, el par RV desarr. / Bitcoin (tipo riesgo / riesgo) pasa de una correlación de 0.02 en calma a 0.58 en estrés, reflejando que ambos activos de riesgo se mueven de forma mucho más sincronizada bajo presión por el efecto de liquidación forzosa."",
+  ""riesgos_de_concentracion"": ""La cartera presenta una elevada concentración en criptoactivos, que suman un 60 por ciento del peso total, mostrando una alta vulnerabilidad conjunta ante episodios de tensión de liquidez."",
+  ""supuestos"": [
+    ""El precio de las stablecoins está anclado a 1 dólar, suponiendo una pérdida para una cesta de stablecoins en un colapso más amplio que el de Terra/UST.""
+  ],
+  ""limitaciones"": [
+    ""Los shocks se calibran con una única ventana histórica, que puede no repetirse en otra crisis."",
+    ""Cada clase de activo se representa con un fondo cotizado, no con la cartera real del inversor."",
+    ""La renta variable desarrollada se representa solo con el S&P 500 (EE. UU.)."",
+    ""El 30.0 por ciento de la cartera se basa en supuestos, no en datos de mercado.""
+  ],
+  ""confianza"": ""baja"",
+  ""justificacion_confianza"": ""Los shocks se calibran con una única ventana histórica, que puede no repetirse en otra crisis. Cada clase de activo se representa con un fondo cotizado, no con la cartera real del inversor. La renta variable desarrollada se representa solo con el S&P 500 (EE. UU.). El 30.0 por ciento de la cartera se basa en supuestos, no en datos de mercado.""
+}"
+v1.4.2,gemini-3.5-flash-lite,defensiva,stablecoins,1,2,"{""direccion_contradictoria"": 1, ""correlacion_no_respaldada"": 1}","[{""tipo"": ""direccion_contradictoria"", ""detalle"": ""'bonos_core' en fase_2: el informe dice 'sube' y los datos indican 'estable' (0.5 %).""}, {""tipo"": ""correlacion_no_respaldada"", ""detalle"": ""Aparece la correlación '-0.88', que no está en los datos.""}]","{
+  ""resumen_ejecutivo"": ""En el escenario de colapso sistémico de stablecoins, la cartera experimenta un impacto negativo moderado que se profundiza en la segunda fase, alcanzando una caída total del -1.21% al final del periodo. La fase 1 se desencadena con el impacto inmediato del desanclaje de UST y el colapso de Terra, afectando negativamente a la renta variable desarrollada y al oro, mientras que los bonos soberanos core muestran resistencia inicial. En la fase 2, el reajuste y el contagio a prestamistas cripto provocan una profundización de las caídas en los activos de riesgo y el oro, ampliando el impacto global de la cartera."",
+  ""cadena_de_contagio"": [
+    {
+      ""fase"": ""fase_1"",
+      ""titulo"": ""Impacto inmediato y pérdida de paridad"",
+      ""descripcion"": ""Durante el periodo comprendido entre el 2022-05-01 y el 2022-05-12, marcado por el hito en el que UST pierde la paridad y Terra colapsa, se desencadenan reembolsos masivos que obligan a vender reservas y generan un desapalancamiento forzado en exchanges y protocolos DeFi. Esto provoca una contracción en la renta variable desarrollada y caídas en el oro, con una contribución negativa al conjunto de la cartera, que cierra esta primera fase con un impacto del -0.33%.""
+    },
+    {
+      ""fase"": ""fase_2"",
+      ""titulo"": ""Contagio y reajuste del ecosistema"",
+      ""descripcion"": ""En el periodo posterior hasta el 2022-06-30, culminando con el contagio a prestamistas cripto y el mínimo de bitcoin, la pérdida de confianza se extiende a los inversores comunes mediante el canal de contagio a activos de riesgo. Como resultado, la renta variable desarrollada y el oro profundizan sus caídas, llevando el impacto acumulado de la cartera al -1.21%, con una profundización de la caída de -0.88 puntos porcentuales respecto a la fase anterior.""
+    }
+  ],
+  ""impacto_por_activo"": [
+    {
+      ""activo"": ""bonos_core"",
+      ""direccion_fase_1"": ""sube"",
+      ""direccion_fase_2"": ""sube"",
+      ""mecanismo"": ""Actúan como activo refugio financiero frente a los reembolsos masivos de reservas y la liquidación de papel comercial, beneficiándose de una menor presión vendedora en la primera fase y manteniéndose positivos en la segunda.""
+    },
+    {
+      ""activo"": ""oro"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""Sufre presiones vendedoras debido al canal de desapalancamiento forzado en exchanges y protocolos DeFi, profundizando su caída en la fase 2 a medida que la aversión al riesgo se generaliza.""
+    },
+    {
+      ""activo"": ""liquidez"",
+      ""direccion_fase_1"": ""estable"",
+      ""direccion_fase_2"": ""estable"",
+      ""mecanismo"": ""Se mantiene sin variación por definición al constituir efectivo y equivalentes monetarios protegidos de los canales de transmisión del escenario.""
+    },
+    {
+      ""activo"": ""rv_desarrollada"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""Reacciona negativamente desde la fase 1 debido a la pérdida de confianza que se extiende a los activos de riesgo con inversores comunes, profundizando su caída en la fase 2 por el desapalancamiento forzado.""
+    }
+  ],
+  ""diversificacion"": ""En cuanto a los refugios de la cartera, ninguno cumple su función estrictamente en la ventana de estrés según el criterio establecido (correlación media con el riesgo por debajo de 0.10 y sin subir en estrés): Bonos soberanos core pasa de una correlación de -0.40 a 0.09 (un cambio de 0.49) y Oro pasa de -0.15 a 0.16 (un cambio de 0.31). No hay datos de correlación media entre activos de riesgo disponibles. Respecto a los pares más relevantes, el par Bonos core / Renta variable desarrollada (refugio / riesgo) pasa de -0.40 a 0.09 (cambio de 0.49), aumentando la varianza de la cartera en un 25.2% debido a la pérdida de la correlación negativa previa; el par Oro / Renta variable desarrollada (refugio / riesgo) pasa de -0.15 a 0.16 (cambio de 0.31), incrementando la varianza en un 8.1% al desacoplarse su comportamiento diversificador tradicional; y el par Bonos core / Oro (refugio / refugio) pasa de 0.53 a 0.41 (cambio de -0.12), reduciendo la varianza en un -5.6% debido a una menor co-movimiento entre ambos activos."",
+  ""riesgos_de_concentracion"": ""La cartera presenta una alta concentración en bonos soberanos core con un peso del 50%, lo que determina el comportamiento global ante movimientos de tipos y refugio, mientras que el resto se reparte entre liquidez (20%), oro (20%) y renta variable desarrollada (10%)."",
+  ""supuestos"": [
+    ""Cada clase de activo se representa mediante un fondo cotizado representativo (IEF, GLD, SPY) sin incluir la cartera real del inversor.""
+  ],
+  ""limitaciones"": [
+    ""Los shocks se calibran utilizando una única ventana histórica (mayo y junio de 2022), la cual podría no repetirse de la misma forma en crisis futuras."",
+    ""La renta variable desarrollada se representa exclusivamente a través del índice S&P 500 de EE. UU.""
+  ],
+  ""confianza"": ""media"",
+  ""justificacion_confianza"": ""Los shocks se calibran con una única ventana histórica, que puede no repetirse en otra crisis. Cada clase de activo se representa con un fondo cotizado, no con la cartera real del inversor. La renta variable desarrollada se representa solo con el S&P 500 (EE. UU.).""
+}"
+v1.4.2,gemini-3.5-flash-lite,defensiva,energia,1,2,"{""cifra_no_respaldada"": 1, ""correlacion_no_respaldada"": 1}","[{""tipo"": ""cifra_no_respaldada"", ""detalle"": ""Aparece '70%', que no está en los datos.""}, {""tipo"": ""correlacion_no_respaldada"", ""detalle"": ""Aparece la correlación '0.10', que no está en los datos.""}]","{
+  ""resumen_ejecutivo"": ""El escenario de shock energético global provoca una transmisión de tensiones sobre la cartera estructurada entre el 2022-02-24 y el 2022-10-31, utilizando como base empírica la invasión de Ucrania y la crisis del gas en Europa. En la fase 1, la cartera experimenta un impacto positivo moderado impulsado por el refugio del oro, mientras que la renta variable desarrollada cae y los bonos core y la liquidez se mantienen estables. En la fase 2, el endurecimiento de la política monetaria y la subida de tipos de interés erosionan el valor de la cartera, provocando que los bonos core y el oro profundicen sus caídas y la renta variable desarrollada amplíe su retroceso, cerrando el periodo con un balance negativo."",
+  ""cadena_de_contagio"": [
+    {
+      ""fase"": ""fase_1"",
+      ""titulo"": ""Impacto inmediato y refugio inicial"",
+      ""descripcion"": ""Entre el 2022-02-24 y el 2022-03-08, marcado por el máximo del petróleo tras la invasión, los canales de transmisión de subida de costes de producción y caída de márgenes empresariales penalizan a la renta variable desarrollada. En contraste, los bonos soberanos core y el oro actúan inicialmente como refugio ante el incremento de la incertidumbre geopolítica, destacando el comportamiento alcista del oro.""
+    },
+    {
+      ""fase"": ""fase_2"",
+      ""titulo"": ""Reajuste por tipos y caída conjunta"",
+      ""descripcion"": ""Desde el 2022-03-08 hasta el 2022-10-31, marcado por las subidas de tipos y la caída conjunta de bolsa y bonos hasta octubre de 2022, el canal de repunte de la inflación y subida de tipos de interés golpea con severidad a los activos de renta fija y metales preciosos. La subida de tipos de interés deteriora el valor de los bonos soberanos core y del oro, mientras que la caída de la renta disponible y del consumo y el deterioro de las balanzas de los países importadores de energía profundizan la caída de la renta variable desarrollada.""
+    }
+  ],
+  ""impacto_por_activo"": [
+    {
+      ""activo"": ""bonos_core"",
+      ""direccion_fase_1"": ""estable"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""Durante la fase 1 se mantiene estable gracias a una demanda inicial de refugio, pero en la fase 2 el canal de repunte de la inflación y subida de tipos de interés provoca una fuerte ampliación de los rendimientos de la deuda soberana que hunde su precio.""
+    },
+    {
+      ""activo"": ""oro"",
+      ""direccion_fase_1"": ""sube"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""En la fase 1 sube impulsado por la búsqueda de activos reales de refugio ante el shock geopolítico, pero en la fase 2 la agresiva subida de tipos de interés incrementa el costo de oportunidad de mantener metales y provoca caídas adicionales.""
+    },
+    {
+      ""activo"": ""liquidez"",
+      ""direccion_fase_1"": ""estable"",
+      ""direccion_fase_2"": ""estable"",
+      ""mecanismo"": ""Por definición, la liquidez y los activos monetarios no sufren variaciones de precio nominal a lo largo de las dos fases del escenario.""
+    },
+    {
+      ""activo"": ""rv_desarrollada"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""baja"",
+      ""mecanismo"": ""Experimenta caídas desde la fase 1 debido a la subida de costes de producción y caída de márgenes empresariales, y profundiza su retroceso en la fase 2 por la caída de la renta disponible y del consumo provocada por la crisis energética.""
+    }
+  ],
+  ""diversificacion"": ""En cuanto a los refugios de la cartera en la ventana de estrés, ni los bonos soberanos core (con una correlación de 0.15) ni el oro (con una correlación de 0.14) cumplieron su función de refugio, ya que ambos superaron el umbral de 0.10 establecido y aumentaron sus correlaciones respecto a la calma. No hay datos de correlación media entre riesgo disponibles al existir un solo activo de riesgo en la cartera analizada. Respecto a los pares más relevantes, en primer lugar, el par Bonos core / Renta variable desarrollada (refugio / riesgo) pasó de una correlación de -0.40 en calma a 0.15 en estrés (cambio de 0.55), generando un impacto del 22.9% en la varianza debido a la pérdida de la capacidad de cobertura cruzada por la simultánea subida de tipos y caída bursátil. En segundo lugar, el par Oro / Renta variable desarrollada (refugio / riesgo) pasó de -0.15 a 0.14 (cambio de 0.29), con un impacto del 6.8% en la varianza por la menor diversificación del metal precioso frente a la renta variable. En tercer lugar, el par Bonos core / Oro (refugio / refugio) pasó de 0.53 a 0.46 (cambio de -0.07), generando un impacto de -3.5% en la varianza al reducirse ligeramente su comovimiento positivo en el entorno de estrés."",
+  ""riesgos_de_concentracion"": ""La cartera presenta una elevada concentración en activos soberanos core y liquidez que suman el 70% del peso total, lo que la expone de manera muy directa al riesgo de duración y a las políticas de los bancos centrales. Asimismo, el activo de riesgo se concentra exclusivamente en renta variable desarrollada, sin exposición a mercados emergentes u otras geografías que diversifiquen el impacto del shock energético."",
+  ""supuestos"": [
+    ""Cada clase de activo se representa mediante fondos cotizados representativos en lugar de la cartera real del inversor."",
+    ""La liquidez se asume sin variación de precio por definición del modelo.""
+  ],
+  ""limitaciones"": [
+    ""Los shocks se han calibrado utilizando una única ventana histórica (la invasión de Ucrania en 2022), la cual podría no repetirse de la misma forma en futuros shocks energéticos."",
+    ""La renta variable desarrollada está representada únicamente por el índice S&P 500 de EE. UU., omitiendo otras economías desarrolladas europeas o asiáticas más directamente expuestas al gas y petróleo importado.""
+  ],
+  ""confianza"": ""media"",
+  ""justificacion_confianza"": ""Los shocks se calibran con una única ventana histórica, que puede no repetirse en otra crisis. Cada clase de activo se representa con un fondo cotizado, no con la cartera real del inversor. La renta variable desarrollada se representa solo con el S&P 500 (EE. UU.).""
+}"
+v1.4.2,gemini-3.5-flash-lite,defensiva,panico_liquidez,1,1,"{""direccion_contradictoria"": 1}","[{""tipo"": ""direccion_contradictoria"", ""detalle"": ""'rv_desarrollada' en fase_2: el informe dice 'sube' y los datos indican 'baja' (-13.6 %).""}]","{
+  ""resumen_ejecutivo"": ""El escenario de pánico global de liquidez genera una tensión inicial en la cartera durante la fase 1, con un impacto total moderado, impulsado por la fuerte caída de la renta variable desarrollada bajo la caída brusca de la demanda esperada y las llamadas de margen. En la fase 2, la cartera recupera terreno y cierra con un saldo positivo gracias a la intervención posterior de bancos centrales y gobiernos. Los bonos soberanos core y el oro actúan como amortiguadores, mientras que la liquidez aporta estabilidad absoluta a lo largo de todo el periodo. La diversificación de la cartera evoluciona favorablemente al reducirse la correlación general en el escenario de estrés."",
+  ""cadena_de_contagio"": [
+    {
+      ""fase"": ""fase_1"",
+      ""titulo"": ""Impacto inmediato y contracción bursátil"",
+      ""descripcion"": ""Entre el 2020-02-19 y el 2020-03-23, el pánico global provoca llamadas de margen que obligan a vender lo que tiene liquidez y una caída brusca de la demanda esperada. La renta variable desarrollada sufre un desplome severo, mientras que el oro experimenta caídas por la necesidad de liquidez inmediata. En contraste, los bonos soberanos core suben con fuerza al actuar como refugio seguro, y la liquidez se mantiene estable, lo que deja a la cartera con un impacto total moderado del -0.89% hasta el mínimo de la bolsa y el anuncio de compras ilimitadas de la Reserva Federal.""
+    },
+    {
+      ""fase"": ""fase_2"",
+      ""titulo"": ""Reajuste y recuperación por intervención oficial"",
+      ""descripcion"": ""Entre el 2020-03-23 y el 2020-04-30, tras la intervención posterior de bancos centrales y gobiernos con compras ilimitadas de activos, la cartera recupera terreno con un movimiento positivo que eleva el impacto acumulado al 3.31% al final de la fase. La renta variable desarrollada recupera parte de su valor previo, y tanto los bonos soberanos core como el oro amplían sus ganancias gracias a la estabilización tras la intervención, culminando el periodo con una recuperación parcial de 4.2 puntos porcentuales respecto al momento más crítico.""
+    }
+  ],
+  ""impacto_por_activo"": [
+    {
+      ""activo"": ""bonos_core"",
+      ""direccion_fase_1"": ""sube"",
+      ""direccion_fase_2"": ""sube"",
+      ""mecanismo"": ""En la fase 1, los bonos soberanos core suben debido a la huida hacia activos seguros frente a la caída brusca de la demanda esperada. En la fase 2, continúan subiendo gracias a la intervención posterior de bancos centrales y gobiernos, ampliando sus ganancias acumuladas.""
+    },
+    {
+      ""activo"": ""oro"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""sube"",
+      ""mecanismo"": ""En la fase 1, el oro baja debido a las llamadas de margen que obligan a vender activos líquidos para cubrir posiciones de efectivo. En la fase 2, recupera su valor al disiparse el pánico inicial de liquidación y beneficiarse de la intervención posterior de bancos centrales y gobiernos.""
+    },
+    {
+      ""activo"": ""liquidez"",
+      ""direccion_fase_1"": ""estable"",
+      ""direccion_fase_2"": ""estable"",
+      ""mecanismo"": ""La liquidez se mantiene sin variación por definición en ambas fases, cumpliendo su función de preservar el valor nominal frente a la huida generalizada hacia el efectivo.""
+    },
+    {
+      ""activo"": ""rv_desarrollada"",
+      ""direccion_fase_1"": ""baja"",
+      ""direccion_fase_2"": ""sube"",
+      ""mecanismo"": ""En la fase 1, la renta variable desarrollada baja fuertemente por la caída brusca de la demanda esperada y las llamadas de margen. En la fase 2, recupera parcialmente parte de las pérdidas iniciales gracias a la intervención posterior de bancos centrales y gobiernos.""
+    }
+  ],
+  ""diversificacion"": ""En cuanto a los refugios de la cartera, los bonos soberanos core cumplen su función de refugio al registrar una correlación media con el riesgo de -0.55 en estrés (por debajo del umbral de 0.10 y sin subir), mientras que el oro no cumple su función de refugio al elevar su correlación media con el riesgo a 0.22 durante el estrés. Por su parte, la correlación media entre los activos de riesgo no está disponible al haber un único activo de riesgo en la cartera. Analizando los pares más relevantes, en primer lugar, el par Bonos core / Oro pasa de 0.53 a 0.11 (cambio de -0.42), reduciendo la varianza de la cartera en un -33.5% debido a la menor co-movimiento entre ambos refugios. En segundo lugar, el par Oro / RV desarr. pasa de -0.15 a 0.22 (cambio de 0.37), aumentando la varianza en un 28.6% al desacoplarse la diversificación tradicional entre el oro y las acciones. En tercer lugar, el par Bonos core / RV desarr. pasa de -0.4 a -0.55 (cambio de -0.15), reduciendo la varianza en un -13.4% al reforzarse la propiedad de cobertura de los bonos frente a las acciones."",
+  ""riesgos_de_concentracion"": ""La cartera presenta una alta concentración en bonos soberanos core, que representan el 50% de la asignación, lo que genera una dependencia significativa de la evolución de los tipos de interés y la deuda soberana en escenarios de crisis."",
+  ""supuestos"": [
+    ""Cada clase de activo se representa mediante un fondo cotizado representativo en lugar de la cartera real del inversor.""
+  ],
+  ""limitaciones"": [
+    ""Los shocks se calibran utilizando una única ventana histórica (el crash por la COVID-19 en 2020), la cual puede no repetirse de la misma forma en futuras crisis."",
+    ""La renta variable desarrollada está representada exclusivamente por el S&P 500 de EE. UU., omitiendo otras geografías desarrolladas.""
+  ],
+  ""confianza"": ""media"",
+  ""justificacion_confianza"": ""Los shocks se calibran con una única ventana histórica, que puede no repetirse en otra crisis. Cada clase de activo se representa con un fondo cotizado, no con la cartera real del inversor. La renta variable desarrollada se representa solo con el S&P 500 (EE. UU.).""
+}"
